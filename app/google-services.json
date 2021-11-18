@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "641787997190",
+    "firebase_url": "https://sukhtara-it-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "sukhtara-it",
+    "storage_bucket": "sukhtara-it.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641787997190:android:03ccd224d7c599f53e6787",
+        "android_client_info": {
+          "package_name": "com.sukhtaraitint.ticketing_system"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "641787997190-k7eu46h8dtpmrg7gcoaa6p6htpk9gcq6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBP4utg6DvaDPzgLg_uFHQrVokJgEjfTJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "641787997190-k7eu46h8dtpmrg7gcoaa6p6htpk9gcq6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

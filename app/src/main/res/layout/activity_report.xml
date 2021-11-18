@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:sweet="http://schemas.android.com/apk/res-auto"
+    tools:context=".ReportActivity">
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimaryDark"
+        android:elevation="2dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        sweet:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        sweet:subtitleTextColor="#ffffff"
+        sweet:titleTextColor="#ffffff">
+
+        <TextView
+            android:id="@+id/tootbartxid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:gravity="center|start"
+            android:text="@string/report"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <androidx.cardview.widget.CardView
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="15dp"
+        app:layout_goneMarginTop="10dp"
+        sweet:cardCornerRadius="10dp">
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioGroup
+                android:id="@+id/rdg_counter_report_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="1"
+                android:orientation="vertical"
+                android:gravity="center|left">
+
+                <RadioButton
+                    android:id="@+id/rdb_by_counter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:text="কাউন্টার অনুযায়ী"
+                    android:layout_marginEnd="10dp"
+                    android:checked="true"
+                    android:textSize="15dp" />
+
+                <RadioButton
+                    android:id="@+id/rdb_by_counters_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:text="কাউন্টারের অবস্থান অনুযায়ী"
+                    android:checked="false"
+                    android:textSize="15dp" />
+            </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/ll_by_counter"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/box_shape"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="কাউন্টারঃ "/>
+
+                <Spinner
+                    android:id="@+id/spinner_counter"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="10dp"
+                    android:paddingLeft="10dp"
+                    android:textColorHint="@color/colorPrimary" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_by_counter_location"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/box_shape"
+                android:gravity="center"
+                android:visibility="gone"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="কাউন্টারঃ "/>
+
+                <Spinner
+                    android:id="@+id/spinner_counter_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="10dp"
+                    android:paddingLeft="10dp"
+                    android:textColorHint="@color/colorPrimary" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_report_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Daily:"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+
+            <TextView
+                android:id="@+id/tv_total_ticket"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="---"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+
+            <TextView
+                android:id="@+id/tv_total_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="---"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_start_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:text="Start Date:"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:text=" To "
+                    android:textAlignment="textStart"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tv_end_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:layout_weight="1"
+                    android:text="End Date: "
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+            <TextView
+                android:id="@+id/tv_date_range_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Daily:"
+                android:visibility="gone"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+
+            <TextView
+                android:id="@+id/tv_total_ticket_date_range"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="---"
+                android:visibility="gone"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+
+            <TextView
+                android:id="@+id/tv_total_amount_date_range"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="---"
+                android:visibility="gone"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+
+            <TextView
+                android:id="@+id/tv_total_bill"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="---"
+                android:visibility="visible"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_margin="20dp"
+        android:contentDescription="Add new counter"
+        android:src="@android:drawable/ic_input_add" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

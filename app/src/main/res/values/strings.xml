@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">উৎসব টিকেট</string>
+    <string name="password">পাসওয়ার্ড</string>
+    <string name="phonenumber">মোবাইল</string>
+    <string name="signinfor_text">SIGN UP FOR AN ACCOUNT ?</string>
+    <string name="login_as_admin">এডমিন হিসেবে লগইন করুন</string>
+    <string name="signin_btn_text">লগইন করুন</string>
+    <string name="username">ব্যাবহারকারীর নাম </string>
+    <string name="sign_in">লগইন করুন</string>
+    <string name="varifi_otp">Verify OTP</string>
+    <string name="submit_otp_here">SUBMIT OTP HERE</string>
+    <string name="report">টিকেট বিক্রির রিপোর্ট</string>
+
+    <string-array name="counter1">
+        <item>Counter 1</item>
+        <item>Dhaka</item>
+        <item>Rangpur</item>
+        <item>Rajshahi</item>
+        <item>Khulna</item>
+    </string-array>
+
+    <string-array name="counter2">
+        <item>Counter 2</item>
+        <item>Dhaka</item>
+        <item>Rangpur</item>
+        <item>Rajshahi</item>
+        <item>Khulna</item>
+    </string-array>
+
+</resources>
