@@ -129,11 +129,28 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:checked="false"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_signin">
 
         </CheckBox>
+
+        <Button
+            android:id="@+id/btn_signin_offline"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/transparent"
+            android:text="@string/signin_btn_text_offline"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            android:layout_marginTop="-50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/btn_signin">
+
+        </Button>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

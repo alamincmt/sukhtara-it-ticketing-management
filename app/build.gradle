@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.sukhtaraitint.ticketing_system"
-        minSdkVersion 22
+        minSdkVersion 24
         targetSdkVersion 31
         versionCode 3
         versionName "0.1.5"

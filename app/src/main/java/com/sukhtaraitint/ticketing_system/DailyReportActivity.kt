@@ -96,6 +96,7 @@ class DailyReportActivity : AppCompatActivity() {
 
         val database = Firebase.database(ConstantValues.DB_URL)
         val ticketSoldRef = database.getReference("ticket_sold")
+        val ticketSoldCounterRef = ticketSoldRef.child(user_id!!)
 
         if(!isFinishing){
             dialog.show()
@@ -142,19 +143,19 @@ class DailyReportActivity : AppCompatActivity() {
                             }
                         }
 
-                        ticketSoldRef.removeEventListener(ticketSoldListenerObj!!)
+                        ticketSoldCounterRef.removeEventListener(ticketSoldListenerObj!!)
                         dialog.hide()
 
                     }
 
                     override fun onCancelled(databaseError: DatabaseError) {
-                        ticketSoldRef.removeEventListener(ticketSoldListenerObj!!)
+                        ticketSoldCounterRef.removeEventListener(ticketSoldListenerObj!!)
                         dialog.hide()
                         // Getting Post failed, log a message
                         Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
                     }
                 }
-                ticketSoldRef.addValueEventListener(ticketSoldListenerObj!!)
+                ticketSoldCounterRef.addValueEventListener(ticketSoldListenerObj!!)
             }
             /*
             requireActivity().runOnUiThread {

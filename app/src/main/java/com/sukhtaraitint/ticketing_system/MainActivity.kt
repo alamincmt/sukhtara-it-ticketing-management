@@ -43,8 +43,8 @@ class MainActivity : AppCompatActivity() {
 
     var serialNo: Int? = 1
     var ticketCount: Int? = 1
-    var totalTicketAmount: Double? = 50.0
-    var perTicketPrice: Double? = 50.0
+    var totalTicketAmount: Int? = 45
+    var perTicketPrice: Int? = 45
     var ticketCountToday: Int? = 0
 
     var totalTicketAmountToday: Double? = 0.0
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Firebase.database.setPersistenceEnabled(true)
+//        Firebase.database.setPersistenceEnabled(true)
         printMe = PrintMe(this)
 
         sharedPref = getSharedPreferences(PREF_NAME, PRIVATE_MODE)
@@ -126,27 +126,6 @@ class MainActivity : AppCompatActivity() {
         initListeners()
     }
 
-    /*private fun syncOfflineData() {
-
-        val ticketDao = TicketManagementDatabase.invoke(applicationContext).tickSoldDao()
-        val tickSolds: List<TicketSold> = ticketDao.getAll()
-        if(isInternetOn(applicationContext)){
-            tickSolds.forEach(){
-                if(it != null){
-                    isNeedToSaveData = true;
-                    getTicketSoldID(ticketSoldId!!, it.from_counter_id!!,
-                        it.to_counter_id!!,
-                        it.price_total!!,
-                        it.total_tickets!!,
-                        it.date_time!!)
-
-                    ticketSoldObjct = it
-                    ticketDao.delete(ticketSoldObjct!!)
-                }
-            }
-        }
-    }*/
-
     private fun initListeners() {
 
         tv_ticket_plus?.setOnClickListener{
@@ -162,12 +141,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         ll_print?.setOnClickListener {
-            val randomValues = List(1) { Random.nextInt(0, 10000) }
             var date = Date(System.currentTimeMillis())
             val timeZoneDate = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
             var mobileDateTime = engNumToBangNum(timeZoneDate.format(date))
 
-            val randomTicketID = engNumToBangNum("" + randomValues.get(0))
             val contactMobiles = engNumToBangNum("01915150908\n01913260001,01831301012");
             val totalTicketAmountBn = engNumToBangNum("" + totalTicketAmount)
 
@@ -187,7 +164,7 @@ class MainActivity : AppCompatActivity() {
                 var serialNoBN = engNumToBangNum("" + serialNo)
                 var ticketCountBN = engNumToBangNum("" + ticketCount)
                 var spannable : SpannableString
-                if(user_id!!.equals("8")){
+                if(counter_group_id!!.equals("7")){
                     spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\nভাড়াঃ ${totalTicketAmountBn} টাকা\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
                     spannable.setSpan(
                         StyleSpan(Typeface.BOLD),
@@ -196,7 +173,7 @@ class MainActivity : AppCompatActivity() {
                         Spannable.SPAN_EXCLUSIVE_INCLUSIVE
                     )
                 }else{
-                    spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\nভাড়াঃ ${totalTicketAmountBn} টাকা(প্রতি টিকেটে \nটোল ৫ টাকা)\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
+                    spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\n(ভাড়া ৪০ টাকা + টোল ৫ টাকা প্রতি টিকেট) = ${totalTicketAmountBn} টাকা\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
                     spannable.setSpan(
                         StyleSpan(Typeface.BOLD),
                         0, // start
@@ -249,8 +226,8 @@ class MainActivity : AppCompatActivity() {
         tv_counter_from?.setText(name)
 
         if(counter_group_id!!.equals("7")){
-            perTicketPrice = 40.0
-            totalTicketAmount = 40.0
+            perTicketPrice = 40
+            totalTicketAmount = 40
         }
 
         tv_ticket_count?.setText(engNumToBangNum("" + ticketCount))
@@ -315,94 +292,6 @@ class MainActivity : AppCompatActivity() {
 //        updateTodaysData()
     }
 
-    private fun updateTodaysData(){
-        val database = Firebase.database(ConstantValues.DB_URL)
-        val ticketSoldRef = database.getReference("ticket_sold")
-
-//        val counterTicketSold = ticketSoldRef.child("from_counter_id").child(fromCounterID!!)
-
-
-        val ticketSoldListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                // Get Post object and use the values to update the UI
-                /*for (snapshot in dataSnapshot.children) {
-                    val totalTicketSold = dataSnapshot.child(snapshot.key!!).value
-                    println(totalTicketSold)
-                }*/
-
-//                val totalTicketSold = dataSnapshot.getValue<List<TicketSold>>()
-//                Log.d("TAG", totalTicketSold?.get(0)?.from_counter_id + "")
-
-                totalTicketAmountToday = 0.0
-                ticketCountToday = 0
-
-                for (snapshot in dataSnapshot.children) {
-                    val totalTicketSold = snapshot.getValue(TicketSold::class.java)
-                    if(totalTicketSold != null){
-                        if(!totalTicketSold.from_counter_id!!.equals("") && totalTicketSold.from_counter_id!!.equals(fromCounterID)){
-                            val cal = Calendar.getInstance()
-                            cal.timeInMillis = totalTicketSold.date_time!!
-
-                            val todaysCalendar = Calendar.getInstance()
-                            todaysCalendar.timeInMillis = System.currentTimeMillis()
-
-                            if(todaysCalendar.get(Calendar.DAY_OF_MONTH) == cal.get(Calendar.DAY_OF_MONTH)){
-                                // get total ticket sold + total ammount
-                                totalTicketAmountToday = totalTicketAmountToday!! + totalTicketSold.price_total!!.toDouble()
-                                ticketCountToday = ticketCountToday!! + totalTicketSold.total_tickets!!.toInt()
-
-                                tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmountToday) + " টাকা")
-                                tv_total_ticket?.setText(
-                                    "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                        "" + ticketCountToday
-                                    )
-                                )
-                            }/*else{
-                                // get total ticket sold + total ammount
-                                totalTicketAmountToday = 0.0
-                                ticketCountToday = 0
-
-                                tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmountToday) + " টাকা")
-                                tv_total_ticket?.setText(
-                                    "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                        "" + ticketCountToday
-                                    )
-                                )
-                            }*/
-                        }
-                    }
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Getting Post failed, log a message
-                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
-            }
-        }
-        ticketSoldRef.addValueEventListener(ticketSoldListener)
-    }
-
-    private fun doWebViewPrint(htmlDocument: String) {
-        // Create a WebView object specifically for printing
-        val webView = WebView(this@MainActivity)
-        webView.webViewClient = object : WebViewClient() {
-
-            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest) = false
-
-            override fun onPageFinished(view: WebView, url: String) {
-                Log.i("TAG", "page finished loading $url")
-                createWebPrintJob(view)
-                mWebView = null
-            }
-        }
-
-        webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null)
-
-        // Keep a reference to WebView object until you pass the PrintDocumentAdapter
-        // to the PrintManager
-        mWebView = webView
-    }
-
     private fun createWebPrintJob(webView: WebView) {
 
         // Get a PrintManager instance
@@ -464,10 +353,10 @@ class MainActivity : AppCompatActivity() {
         val admin = Admins(id, name, username, password, location, phone)
         // Write a message to the database
         val database = Firebase.database(ConstantValues.DB_URL)
-        val myRef = database.getReference("admin")
-        myRef.keepSynced(true)
+        val ticketSoldReference = database.getReference("admin")
+        ticketSoldReference.keepSynced(true)
 
-        myRef.child(id.toString()).setValue(admin)
+        ticketSoldReference.child(id.toString()).setValue(admin)
             .addOnSuccessListener {
                 Toast.makeText(applicationContext, "Admin Added Successfully. ", Toast.LENGTH_LONG)
             }
@@ -498,10 +387,12 @@ class MainActivity : AppCompatActivity() {
 
         // Write a message to the database
         val database = Firebase.database(ConstantValues.DB_URL)
-        val myRef = database.getReference("ticket_sold")
-        myRef.keepSynced(true)
+        val ticketSoldReference = database.getReference("ticket_sold")
+        ticketSoldReference.keepSynced(true)
+        val ticketSoldCounterRef = ticketSoldReference.child(from_counter_id)
+        ticketSoldCounterRef.keepSynced(true)
 
-        myRef.child(createTransactionID()!!).setValue(ticketSold)
+        ticketSoldCounterRef.child(createTransactionID()!!).setValue(ticketSold)
             .addOnSuccessListener {
 //                Toast.makeText(applicationContext, "Operation Successful. ", Toast.LENGTH_LONG).show()
             }

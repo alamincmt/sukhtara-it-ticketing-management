@@ -1,0 +1,185 @@
+[{
+  "group_id" : 1,
+  "id" : 1,
+  "location" : "Narayanganj",
+  "name" : "১নং কাউন্টার",
+  "password" : "counter1@123",
+  "phone" : "+8801738001777",
+  "user_name" : "counter1"
+}, {
+  "group_id" : 2,
+  "id" : 2,
+  "location" : "নারায়ণগঞ্জ",
+  "name" : "২ নং কাউন্টার",
+  "password" : "counter2@123",
+  "phone" : "+8801738001777",
+  "user_name" : "counter2"
+}, {
+  "group_id" : 3,
+  "id" : 3,
+  "location" : "নারায়ণগঞ্জ",
+  "name" : "৩ নং কাউন্টার",
+  "password" : "counter3@123",
+  "phone" : "+8801738001777",
+  "user_name" : "counter3"
+}, {
+  "group_id" : 3,
+  "id" : 4,
+  "location" : "নারায়ণগঞ্জ",
+  "name" : "চাষারা, ৪ নং কাউন্টার",
+  "password" : "counter4@123",
+  "phone" : "+8801738001777",
+  "user_name" : "counter4"
+}, {
+  "group_id" : 4,
+  "id" : 5,
+  "location" : "নারায়ণগঞ্জ",
+  "name" : "শিবু মার্কেট, ৫ নং কাউন্টার",
+  "password" : "counter5@123",
+  "phone" : "+8801738001777",
+  "user_name" : "counter5"
+}, {
+  "group_id" : 5,
+  "id" : 6,
+  "location" : "Dhaka",
+  "name" : "বায়তুল মোকারম",
+  "password" : "baitul@123",
+  "phone" : "+8801738001777",
+  "user_name" : "baitul"
+}, {
+  "group_id" : 6,
+  "id" : 7,
+  "location" : "Dhaka",
+  "name" : "গুলিস্তান",
+  "password" : "gulistan@123",
+  "phone" : "+8801738001777",
+  "user_name" : "gulistan"
+}, {
+  "group_id" : 7,
+  "id" : 8,
+  "location" : "Dhaka",
+  "name" : "যাত্রাবাড়ী",
+  "password" : "jatrabari@123",
+  "phone" : "+8801738001777",
+  "user_name" : "jatrabari"
+}, {
+  "group_id" : 1,
+  "id" : 9,
+  "location" : "নারায়ণগঞ্জ",
+  "name" : "নারায়ণগঞ্জ",
+  "password" : "narayanganj@123",
+  "phone" : "+8801738001777",
+  "user_name" : "narayanganj"
+}, {
+  "group_id" : 5,
+  "id" : 10,
+  "location" : "বায়তুল মোকাররম",
+  "name" : "বায়তুল মোকাররম - ২",
+  "password" : "baitul2@123",
+  "phone" : "+8801738001777",
+  "user_name" : "baitul2"
+}, {
+  "group_id" : 5,
+  "id" : 11,
+  "location" : "বায়তুল মোকাররম",
+  "name" : "বায়তুল মোকাররম - ৩",
+  "password" : "baitul3@123",
+  "phone" : "+8801738001777",
+  "user_name" : "baitul3"
+}, {
+  "group_id" : 6,
+  "id" : 12,
+  "location" : "গুলিস্তান",
+  "name" : "গুলিস্তান -১",
+  "password" : "gulistan1@123",
+  "phone" : "01500000000",
+  "user_name" : "gulistan1"
+}, {
+  "group_id" : 6,
+  "id" : 13,
+  "location" : "গুলিস্তান",
+  "name" : "গুলিস্তান - ২",
+  "password" : "gulistan2@123",
+  "phone" : "+8801738001777",
+  "user_name" : "gulistan2"
+}, {
+  "group_id" : 6,
+  "id" : 14,
+  "location" : "গুলিস্তান",
+  "name" : "গুলিস্তান - ৩",
+  "password" : "gulistan3@123",
+  "phone" : "+8801738001777",
+  "user_name" : "gulistan3"
+}, {
+  "group_id" : 6,
+  "id" : 15,
+  "location" : "গুলিস্তান",
+  "name" : "গুলিস্তান - ৪",
+  "password" : "gulistan4@123",
+  "phone" : "+8801738001777",
+  "user_name" : "gulistan4"
+}, {
+  "group_id" : 7,
+  "id" : 16,
+  "location" : "যাত্রাবাড়ী",
+  "name" : "যাত্রাবাড়ী - ২",
+  "password" : "jatrabari2@123",
+  "phone" : "+8801738001777",
+  "user_name" : "jatrabari2"
+}, {
+  "group_id" : 5,
+  "id" : 17,
+  "location" : "বাইতুল মোকাররম",
+  "name" : "বাইতুল মোকাররম ১",
+  "password" : "baitul1@123",
+  "phone" : "01717644866",
+  "user_name" : "baitul1"
+}, {
+  "group_id" : 5,
+  "id" : 18,
+  "location" : "বাইতুল মোকাররম",
+  "name" : "বাইতুল মোকাররম ০০",
+  "password" : "baitul00@123",
+  "phone" : "01945199279",
+  "user_name" : "baitul00"
+}, {
+  "group_id" : 5,
+  "id" : 19,
+  "location" : "বাইতুল মোকাররম ০২",
+  "name" : "বাইতুল মোকাররম ০২",
+  "password" : "baitul02@123",
+  "phone" : "01945199279",
+  "user_name" : "baitul02"
+}, {
+  "group_id" : 1,
+  "id" : 20,
+  "location" : "১ নং কাউন্টার ০১",
+  "name" : "১ নং কাউন্টার ০১",
+  "password" : "counter01@123",
+  "phone" : "0150000000",
+  "user_name" : "counter01"
+}, {
+  "group_id" : 2,
+  "id" : 21,
+  "location" : "২ নং কাউনটার ১",
+  "name" : "২ নং কাউনটার ১",
+  "password" : "counter21@123",
+  "phone" : "01714070437",
+  "user_name" : "counter21"
+}, {
+  "group_id" : 3,
+  "id" : 22,
+  "location" : "চাষাড় ১, ৪নং কাউনটার",
+  "name" : "চাষাড় ১, ৪নং কাউনটার",
+  "password" : "counter@41123",
+  "phone" : "01717644866",
+  "user_name" : "counter41"
+}, {
+  "group_id" : 4,
+  "id" : 23,
+  "location" : "শিবু মার্কেট",
+  "name" : "শিবু মার্কেট - ১",
+  "password" : "shibumarket1@123",
+  "phone" : "+8801738001777",
+  "user_name" : "shibumarket1"
+} ]
