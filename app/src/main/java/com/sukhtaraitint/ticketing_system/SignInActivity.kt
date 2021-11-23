@@ -53,7 +53,7 @@ class SignInActivity : AppCompatActivity() {
         val user_name = sharedPref?.getString("user_name", "")
         val user_type = sharedPref?.getString("user_type", "")
         if(user_name != null && !user_name.equals("")){
-            if(user_type != null && user_type.equals("admin")){
+            if(user_type != null && (user_type.equals("admin") || user_type.equals("supadmin"))){
                 startActivity(Intent(applicationContext, ReportActivity::class.java))
             }else{
                 startActivity(Intent(applicationContext, MainActivity::class.java))
@@ -116,7 +116,11 @@ class SignInActivity : AppCompatActivity() {
                                 }
 
                                 if(adminObj != null){
-                                    edit?.putString("user_type", "admin");
+                                    if(userName!!.equals("supadmin")){
+                                        edit?.putString("user_type", "supadmin")
+                                    }else{
+                                        edit?.putString("user_type", "admin")
+                                    }
                                     edit?.putString("user_id", ""+ adminObj?.id);
                                     edit?.putString("user_name", adminObj?.user_name);
                                     edit?.putString("name", adminObj?.name);

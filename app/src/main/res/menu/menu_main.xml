@@ -8,6 +8,7 @@
 
     <item
         android:id="@+id/daily_report"
+        android:visible="false"
         android:title="দৈনিক" />
     <item
         android:id="@+id/logout"

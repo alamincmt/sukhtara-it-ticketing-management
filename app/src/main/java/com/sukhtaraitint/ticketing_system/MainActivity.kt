@@ -63,6 +63,8 @@ class MainActivity : AppCompatActivity() {
     var tv_username : TextView? = null
     var tv_phonenumber : TextView? = null
 
+    var btn_daily_report : Button? = null
+
     var tv_counter_from : TextView? = null
     var spinner_to : Spinner? = null
 
@@ -137,6 +139,14 @@ class MainActivity : AppCompatActivity() {
             if(ticketCount!! > 1){
                 ticketCount = ticketCount!! - 1;
                 calculatePrice()
+            }
+        }
+
+        btn_daily_report?.setOnClickListener {
+            if(isInternetOn(applicationContext)){
+                startActivity(Intent(applicationContext, DailyReportActivity::class.java))
+            }else{
+                Toast.makeText(applicationContext, "ইন্টারনেট কানেকশন দিয়ে পুনরায় চেষ্টা করুন ।", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -335,6 +345,7 @@ class MainActivity : AppCompatActivity() {
         tv_total_amount = findViewById(R.id.tv_total_amount)
 
         ll_print = findViewById(R.id.ll_print)
+        btn_daily_report = findViewById(R.id.btn_daily_report)
 
         tv_counter_from = findViewById(R.id.tv_counter_from)
         tv_total_vara = findViewById(R.id.tv_total_vara)

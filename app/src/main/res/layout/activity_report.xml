@@ -53,6 +53,7 @@
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:orientation="vertical">
 
             <RadioGroup
@@ -205,6 +206,7 @@
                     android:textSize="18sp" />
 
             </LinearLayout>
+
             <TextView
                 android:id="@+id/tv_date_range_value"
                 android:layout_width="match_parent"
@@ -251,6 +253,21 @@
                 android:textAlignment="textStart"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/et_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:inputType="number"
+                android:textSize="25dp"
+                android:text="0.14"
+                android:imeOptions="actionDone"
+                android:textColor="@color/colorPrimary"
+                app:layout_constraintBottom_toTopOf="@id/tv_password"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
 
         </LinearLayout>
 

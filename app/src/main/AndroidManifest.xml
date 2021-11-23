@@ -18,9 +18,11 @@
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name="com.sukhtaraitint.ticketing_system.AddNewCounterActivity"
+            android:parentActivityName="com.sukhtaraitint.ticketing_system.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.sukhtaraitint.ticketing_system.ReportActivity"
+            android:parentActivityName="com.sukhtaraitint.ticketing_system.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.sukhtaraitint.ticketing_system.VerifyOTPActivity"

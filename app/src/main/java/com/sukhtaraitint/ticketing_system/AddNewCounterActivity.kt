@@ -45,12 +45,10 @@ class AddNewCounterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_new_counter)
-        Firebase.database.setPersistenceEnabled(true)
 
         val toolbar = findViewById(R.id.toolbar) as androidx.appcompat.widget.Toolbar?
         setSupportActionBar(toolbar)
 
-        //set back button
         supportActionBar?.apply {
             // show back button on toolbar
             // on back button press, it will navigate to parent activity
