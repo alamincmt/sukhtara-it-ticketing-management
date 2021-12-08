@@ -254,20 +254,42 @@
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
-            <EditText
-                android:id="@+id/et_price"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:backgroundTint="@color/colorPrimary"
-                android:inputType="number"
-                android:textSize="25dp"
-                android:text="0.14"
-                android:imeOptions="actionDone"
-                android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toTopOf="@id/tv_password"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/et_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:inputType="number"
+                    android:textSize="25dp"
+                    android:text="0.14"
+                    android:imeOptions="actionDone"
+                    android:textColor="@color/colorPrimary"/>
+
+                <Button
+                    android:id="@+id/button_refresh_report"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/signin_btn_design"
+                    android:text="@string/refresh_button_text"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </Button>
+
+            </LinearLayout>
 
         </LinearLayout>
 

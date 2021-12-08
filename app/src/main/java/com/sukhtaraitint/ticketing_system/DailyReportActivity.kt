@@ -96,7 +96,9 @@ class DailyReportActivity : AppCompatActivity() {
 
         val database = Firebase.database(ConstantValues.DB_URL)
         val ticketSoldRef = database.getReference("ticket_sold")
+        ticketSoldRef.keepSynced(true)
         val ticketSoldCounterRef = ticketSoldRef.child(user_id!!)
+        ticketSoldRef.keepSynced(true)
 
         if(!isFinishing){
             dialog.show()

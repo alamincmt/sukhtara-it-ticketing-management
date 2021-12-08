@@ -29,16 +29,28 @@ import com.sukhtaraitint.ticketing_system.models.Admins
 import com.sukhtaraitint.ticketing_system.models.Counters
 import com.sukhtaraitint.ticketing_system.models.TicketSold
 import com.sukhtaraitint.ticketing_system.utils.ConstantValues
+import com.sunmi.peripheral.printer.WoyouConsts
+import woyou.aidlservice.jiuiv5.ICallback
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
+import android.content.IntentFilter
+import woyou.aidlservice.jiuiv5.IWoyouService
+
+import android.os.IBinder
+
+import android.content.ComponentName
+
+import android.content.ServiceConnection
+import com.sukhtaraitint.ticketing_system.receivers.PrinterStatusReceiver
 
 
 class MainActivity : AppCompatActivity() {
 
     private var PRIVATE_MODE = 0
     private val PREF_NAME = "ticket-management"
+    private val TAG = MainActivity::class.java.name
     var sharedPref: SharedPreferences? = null
 
     var serialNo: Int? = 1
@@ -81,6 +93,31 @@ class MainActivity : AppCompatActivity() {
     private var mWebView: WebView? = null
     var printMe : PrintMe? = null
     var ticketSoldObjct : TicketSold? = null
+
+    private var woyouService: IWoyouService? = null
+    private val printerStatusReceiver: PrinterStatusReceiver = PrinterStatusReceiver()
+
+    private val connService: ServiceConnection = object : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName) {
+            woyouService = null
+            Log.d(TAG, "Service disconnected")
+        }
+
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            woyouService = IWoyouService.Stub.asInterface(service)
+            Log.d(TAG, "Service connected")
+        }
+    }
+
+    val OUT_OF_PAPER_ACTION = "woyou.aidlservice.jiuv5.OUT_OF_PAPER_ACTION"
+    val ERROR_ACTION = "woyou.aidlservice.jiuv5.ERROR_ACTION"
+    val NORMAL_ACTION = "woyou.aidlservice.jiuv5.NORMAL_ACTION"
+    val COVER_OPEN_ACTION = "woyou.aidlservice.jiuv5.COVER_OPEN_ACTION"
+    val COVER_ERROR_ACTION = "woyou.aidlservice.jiuv5.COVER_ERROR_ACTION"
+    val KNIFE_ERROR_1_ACTION = "woyou.aidlservice.jiuv5.KNIFE_ERROR_ACTION_1"
+    val KNIFE_ERROR_2_ACTION = "woyou.aidlservice.jiuv5.KNIFE_ERROR_ACTION_2"
+    val OVER_HEATING_ACITON = "woyou.aidlservice.jiuv5.OVER_HEATING_ACITON"
+    val FIRMWARE_UPDATING_ACITON = "woyou.aidlservice.jiuv5.FIRMWARE_UPDATING_ACITON"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,6 +167,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun initListeners() {
 
+        val intent = Intent()
+        intent.setPackage("woyou.aidlservice.jiuiv5")
+        intent.action = "woyou.aidlservice.jiuiv5.IWoyouService"
+
+        applicationContext.startService(intent)
+        applicationContext.bindService(intent, connService, BIND_AUTO_CREATE)
+
+        val mFilter = IntentFilter()
+        mFilter.addAction(OUT_OF_PAPER_ACTION)
+        mFilter.addAction(ERROR_ACTION)
+        mFilter.addAction(NORMAL_ACTION)
+        mFilter.addAction(COVER_OPEN_ACTION)
+        mFilter.addAction(COVER_ERROR_ACTION)
+        mFilter.addAction(KNIFE_ERROR_1_ACTION)
+        mFilter.addAction(KNIFE_ERROR_2_ACTION)
+        mFilter.addAction(OVER_HEATING_ACITON)
+        mFilter.addAction(FIRMWARE_UPDATING_ACITON)
+
+        applicationContext.registerReceiver(printerStatusReceiver, mFilter)
+
         tv_ticket_plus?.setOnClickListener{
             ticketCount = ticketCount!! + 1;
             calculatePrice()
@@ -143,11 +200,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         btn_daily_report?.setOnClickListener {
-            if(isInternetOn(applicationContext)){
+            startActivity(Intent(applicationContext, DailyReportActivity::class.java))
+            /*if(isInternetOn(applicationContext)){
                 startActivity(Intent(applicationContext, DailyReportActivity::class.java))
             }else{
                 Toast.makeText(applicationContext, "ইন্টারনেট কানেকশন দিয়ে পুনরায় চেষ্টা করুন ।", Toast.LENGTH_LONG).show()
-            }
+            }*/
         }
 
         ll_print?.setOnClickListener {
