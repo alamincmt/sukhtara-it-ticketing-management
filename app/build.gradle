@@ -48,6 +48,9 @@ dependencies {
 
     implementation 'com.sunmi:printerlibrary:1.0.13'
 
+    // pdf creator library
+    implementation 'com.github.tejpratap46:PDFCreatorAndroid:3.0.2'
+
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:28.4.1')
     implementation 'com.google.firebase:firebase-analytics-ktx'

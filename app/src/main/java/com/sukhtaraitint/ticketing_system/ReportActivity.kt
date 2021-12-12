@@ -21,6 +21,7 @@ import com.google.firebase.ktx.Firebase
 import com.sukhtaraitint.ticketing_system.models.CounterGroups
 import com.sukhtaraitint.ticketing_system.models.Counters
 import com.sukhtaraitint.ticketing_system.models.TicketSold
+import com.sukhtaraitint.ticketing_system.models.TotalTicketSoldReport
 import com.sukhtaraitint.ticketing_system.utils.ConstantValues
 import com.sukhtaraitint.ticketing_system.utils.ProgressDialog
 import java.text.SimpleDateFormat
@@ -329,13 +330,22 @@ class ReportActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_report, menu)
 
         var menuItem: MenuItem = menu.findItem(R.id.delete_total_report)
+        var billMenuItem: MenuItem = menu.findItem(R.id.bill_generate)
         if(menuItem != null){
             menuItem.setVisible(false)
+        }
+
+        if(billMenuItem != null){
+            billMenuItem.setVisible(false)
         }
 
         if(user_type!!.equals("supadmin")){
             if(menuItem != null){
                 menuItem.setVisible(true)
+            }
+
+            if(billMenuItem != null){
+                billMenuItem.setVisible(true)
             }
         }
 
@@ -346,7 +356,9 @@ class ReportActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.sync_data -> {
                 // todo: implement sync functionality here.
-
+                if(user_type!!.equals("supadmin")){
+                    saveTotalSoldTicketReport()
+                }
                 true
             }
             R.id.daily_report -> {
@@ -365,27 +377,16 @@ class ReportActivity : AppCompatActivity() {
                 return true
             }
             R.id.delete_total_report -> {
-                val builder = AlertDialog.Builder(this)
-                //set title for alert dialog
-                builder.setTitle("Warning")
-                //set message for alert dialog
-                builder.setMessage("Are you sure want to delete all data?")
-                builder.setIcon(android.R.drawable.ic_dialog_alert)
+                showTicketSoldReportDeleteDialog("Are you sure want to delete all data?")
+                return true
+            }
+            R.id.bill_generate -> {
+                // todo: generate bill here.
+                // get all the data from db
+                // make pdf
+                // send to transport owner
 
-                //performing positive action
-                builder.setPositiveButton("Yes"){dialogInterface, which ->
-                    deleteTicketSoldReport()
-//                    updateTodaysData("daily", reportTypeWithCounterType!!)
-                }
-                //performing negative action
-                builder.setNegativeButton("No"){dialogInterface, which ->
-                    builder.create().dismiss()
-                }
-                // Create the AlertDialog
-                val alertDialog: AlertDialog = builder.create()
-                // Set other dialog properties
-                alertDialog.setCancelable(false)
-                alertDialog.show()
+                startActivity(Intent(applicationContext, BillGenerateActivity::class.java))
                 return true
             }
             R.id.logout -> {
@@ -403,6 +404,58 @@ class ReportActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun showTicketSoldReportDeleteDialog(message: String) {
+        val builder = AlertDialog.Builder(this)
+        //set title for alert dialog
+        builder.setTitle("Warning")
+        //set message for alert dialog
+        builder.setMessage(message)
+        builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+        //performing positive action
+        builder.setPositiveButton("Yes"){dialogInterface, which ->
+            deleteTicketSoldReport()
+//                    updateTodaysData("daily", reportTypeWithCounterType!!)
+        }
+        //performing negative action
+        builder.setNegativeButton("No"){dialogInterface, which ->
+            builder.create().dismiss()
+        }
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = builder.create()
+        // Set other dialog properties
+        alertDialog.setCancelable(false)
+        alertDialog.show()
+    }
+
+    private fun saveTotalSoldTicketReport() {
+        val totalTicketSoldReportObj = TotalTicketSoldReport(ticketCount,
+            System.currentTimeMillis(),
+            user_type
+        )
+
+        // Write a message to the database
+        val database = Firebase.database(ConstantValues.DB_URL)
+        val ticketSoldReportReference = database.getReference("daily_sell_report")
+        ticketSoldReportReference.keepSynced(true)
+
+        ticketSoldReportReference.child(createTicketSoldReportID()!!).setValue(totalTicketSoldReportObj)
+            .addOnSuccessListener {
+                Toast.makeText(applicationContext, "Data Successfully Synced. ", Toast.LENGTH_LONG).show()
+                showTicketSoldReportDeleteDialog("Data Successfully Backed Up. You can delete data now.\n\nAre you sure want to delete all data?")
+            }
+            .addOnFailureListener {
+                Toast.makeText(applicationContext, "Data Sync Failed\nPlease try again. ", Toast.LENGTH_LONG).show()
+            }
+    }
+
+
+
+    @Throws(Exception::class)
+    fun createTicketSoldReportID(): String? {
+        return UUID.randomUUID().toString() + "_" + System.currentTimeMillis()
     }
 
     private fun deleteTicketSoldReport() {

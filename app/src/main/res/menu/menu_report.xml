@@ -16,6 +16,9 @@
         android:id="@+id/delete_total_report"
         android:title="সবগুলো ডাটা মুছুন" />
     <item
+        android:id="@+id/bill_generate"
+        android:title="বিল জেনারেট" />
+    <item
         android:id="@+id/logout"
         android:title="লগআউট" />
 </menu>
