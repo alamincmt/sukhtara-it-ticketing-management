@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>jatrabari_price</key>
+        <value>40</value>
+    </entry>
+    <entry>
+        <key>other_price</key>
+        <value>45</value>
+    </entry>
+</defaultsMap>

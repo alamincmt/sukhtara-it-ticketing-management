@@ -43,6 +43,9 @@ import android.os.IBinder
 import android.content.ComponentName
 
 import android.content.ServiceConnection
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.sukhtaraitint.ticketing_system.receivers.PrinterStatusReceiver
 
 
@@ -160,9 +163,56 @@ class MainActivity : AppCompatActivity() {
 
 //        syncOfflineData()
 
+        getUpdatedPrice()
         initViews()
         loadData()
         initListeners()
+    }
+
+    private fun getUpdatedPrice() {
+        var remoteConfig = Firebase.remoteConfig
+        val configSettings = remoteConfigSettings {
+            minimumFetchIntervalInSeconds = 3600
+        }
+        remoteConfig.setConfigSettingsAsync(configSettings)
+//        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
+
+        remoteConfig.fetchAndActivate()
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val updated = task.result
+
+                    var fireBaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+                    fireBaseRemoteConfig.fetch().addOnCompleteListener(this) { task ->
+                        if(counter_group_id!!.equals("7")){
+                            perTicketPrice = fireBaseRemoteConfig.getDouble("jatrabari_price").toInt()
+                            totalTicketAmount = fireBaseRemoteConfig.getDouble("jatrabari_price").toInt()
+                        }else{
+                            perTicketPrice = fireBaseRemoteConfig.getDouble("other_price").toInt()
+                            totalTicketAmount = fireBaseRemoteConfig.getDouble("other_price").toInt()
+                        }
+                    }
+
+
+
+                    /*Log.d(TAG, "Config params updated: $updated")
+                    Toast.makeText(this, "Fetch and activate succeeded",
+                        Toast.LENGTH_SHORT).show()*/
+                } else {
+                    /*Toast.makeText(this, "Fetch failed",
+                        Toast.LENGTH_SHORT).show()*/
+                }
+            }
+
+        /*if(counter_group_id!!.equals("7")){
+            perTicketPrice = remoteConfig.getDouble("jatrabari_price").toInt()
+            totalTicketAmount = remoteConfig.getDouble("jatrabari_price").toInt()
+        }else{
+            perTicketPrice = remoteConfig.getDouble("other_price").toInt()
+            totalTicketAmount = remoteConfig.getDouble("other_price").toInt()
+        }*/
+
+
     }
 
     private fun initListeners() {
