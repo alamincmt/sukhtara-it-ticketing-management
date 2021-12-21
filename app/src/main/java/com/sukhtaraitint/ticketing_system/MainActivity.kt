@@ -43,9 +43,7 @@ import android.os.IBinder
 import android.content.ComponentName
 
 import android.content.ServiceConnection
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
+import com.sukhtaraitint.ticketing_system.models.CounterWiseTicketPrice
 import com.sukhtaraitint.ticketing_system.receivers.PrinterStatusReceiver
 
 
@@ -163,56 +161,9 @@ class MainActivity : AppCompatActivity() {
 
 //        syncOfflineData()
 
-        getUpdatedPrice()
         initViews()
         loadData()
         initListeners()
-    }
-
-    private fun getUpdatedPrice() {
-        var remoteConfig = Firebase.remoteConfig
-        val configSettings = remoteConfigSettings {
-            minimumFetchIntervalInSeconds = 3600
-        }
-        remoteConfig.setConfigSettingsAsync(configSettings)
-//        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
-
-        remoteConfig.fetchAndActivate()
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    val updated = task.result
-
-                    var fireBaseRemoteConfig = FirebaseRemoteConfig.getInstance()
-                    fireBaseRemoteConfig.fetch().addOnCompleteListener(this) { task ->
-                        if(counter_group_id!!.equals("7")){
-                            perTicketPrice = fireBaseRemoteConfig.getDouble("jatrabari_price").toInt()
-                            totalTicketAmount = fireBaseRemoteConfig.getDouble("jatrabari_price").toInt()
-                        }else{
-                            perTicketPrice = fireBaseRemoteConfig.getDouble("other_price").toInt()
-                            totalTicketAmount = fireBaseRemoteConfig.getDouble("other_price").toInt()
-                        }
-                    }
-
-
-
-                    /*Log.d(TAG, "Config params updated: $updated")
-                    Toast.makeText(this, "Fetch and activate succeeded",
-                        Toast.LENGTH_SHORT).show()*/
-                } else {
-                    /*Toast.makeText(this, "Fetch failed",
-                        Toast.LENGTH_SHORT).show()*/
-                }
-            }
-
-        /*if(counter_group_id!!.equals("7")){
-            perTicketPrice = remoteConfig.getDouble("jatrabari_price").toInt()
-            totalTicketAmount = remoteConfig.getDouble("jatrabari_price").toInt()
-        }else{
-            perTicketPrice = remoteConfig.getDouble("other_price").toInt()
-            totalTicketAmount = remoteConfig.getDouble("other_price").toInt()
-        }*/
-
-
     }
 
     private fun initListeners() {
@@ -384,8 +335,10 @@ class MainActivity : AppCompatActivity() {
                                 view: View, position: Int, id: Long
                             ) {
                                 toCounter = counterList!![position]
+
                                 if(counters != null && counters.get(position) != null){
                                     toCounterID = ""+counters.get(position).id
+                                    getSelectedCounterTicketPrice(counter_group_id!!.toInt(), counters.get(position).group_id)
                                 }
                                 /*Toast.makeText(this@MainActivity,
                                     counterList!![position] + " selected.", Toast.LENGTH_SHORT).show()*/
@@ -408,6 +361,38 @@ class MainActivity : AppCompatActivity() {
         counterRef.addValueEventListener(counterListener)
 
 //        updateTodaysData()
+    }
+
+    private fun getSelectedCounterTicketPrice(fromCounterGroupId: Int?, toCounterGroupId: Int?) {
+        val database = Firebase.database(ConstantValues.DB_URL)
+        val counterWisePriceRef = database.getReference("counter_wise_price")
+
+        val counterGroupListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                val counterWisePrice = dataSnapshot.getValue<List<CounterWiseTicketPrice>>()
+                if(counterWisePrice != null && counterWisePrice.size > 0){
+                    counterWisePrice?.forEach {
+                        if(it != null){
+                            if(!it.price!!.equals("") &&
+                                it.from_counter_id!!.toInt() == fromCounterGroupId &&
+                                it.to_counter_id!!.toInt() == toCounterGroupId){
+                                perTicketPrice = it.price!!.toInt()
+                                totalTicketAmount = perTicketPrice!!
+
+                                calculatePrice()
+                            }
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+        counterWisePriceRef.addValueEventListener(counterGroupListener)
     }
 
     private fun createWebPrintJob(webView: WebView) {
@@ -459,29 +444,6 @@ class MainActivity : AppCompatActivity() {
         tv_total_vara = findViewById(R.id.tv_total_vara)
 
         spinner_to = findViewById(R.id.spinner_to)
-    }
-
-    fun addNewAdmin(
-        id: Int,
-        name: String,
-        username: String,
-        password: String,
-        location: String,
-        phone: String
-    ) {
-        val admin = Admins(id, name, username, password, location, phone)
-        // Write a message to the database
-        val database = Firebase.database(ConstantValues.DB_URL)
-        val ticketSoldReference = database.getReference("admin")
-        ticketSoldReference.keepSynced(true)
-
-        ticketSoldReference.child(id.toString()).setValue(admin)
-            .addOnSuccessListener {
-                Toast.makeText(applicationContext, "Admin Added Successfully. ", Toast.LENGTH_LONG)
-            }
-            .addOnFailureListener {
-                Toast.makeText(applicationContext, "Admin Add Failed. ", Toast.LENGTH_LONG)
-            }
     }
 
     fun addTicketSold(

@@ -176,6 +176,7 @@ class SetPriceActivity : AppCompatActivity() {
     private fun getCounterWiseTicketPrice() {
         val database = Firebase.database(ConstantValues.DB_URL)
         val counterWisePriceRef = database.getReference("counter_wise_price")
+        counterWiseTicketPriceId = 0
 
         val counterGroupListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -183,12 +184,10 @@ class SetPriceActivity : AppCompatActivity() {
                 val counterWisePrice = dataSnapshot.getValue<List<CounterWiseTicketPrice>>()
 
                 counterWisePriceList!!.clear()
-                counterWiseTicketPriceId = 0
                 counterWisePrice?.forEach {
                     if(it != null){
                         if(!it.price!!.equals("")){
                             counterWisePriceList?.add(it)
-                            counterWiseTicketPriceId = it.id!!.toInt()
                         }
 
                         counterWiseTicketPriceLastId = it.id!!.toInt()
@@ -213,6 +212,7 @@ class SetPriceActivity : AppCompatActivity() {
                 counterWisePriceList!!.forEach {
                     if(it.from_counter_id.equals(fromCounterId) && it.to_counter_id.equals(toCounterId)){
                         et_price!!.setText(it.price + "")
+                        counterWiseTicketPriceId = it.id!!.toInt()
                     }
                 }
             }
@@ -231,7 +231,7 @@ class SetPriceActivity : AppCompatActivity() {
                 if(counterWiseTicketPriceId != 0){
                     addOrUpdatePrice(counterWiseTicketPriceId.toString(), ticket_price!!.toDouble(), fromCounterId!!, toCounterId!!, user_id!!)
                 }else{
-                    counterWiseTicketPriceId += counterWiseTicketPriceId + 1
+                    counterWiseTicketPriceLastId = counterWiseTicketPriceLastId + 1
                     addOrUpdatePrice(counterWiseTicketPriceLastId.toString(), ticket_price!!.toDouble(), fromCounterId!!, toCounterId!!, user_id!!)
                 }
             }else{
