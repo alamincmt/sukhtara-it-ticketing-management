@@ -331,12 +331,17 @@ class ReportActivity : AppCompatActivity() {
 
         var menuItem: MenuItem = menu.findItem(R.id.delete_total_report)
         var billMenuItem: MenuItem = menu.findItem(R.id.bill_generate)
+        var priceMenuItem: MenuItem = menu.findItem(R.id.ticket_price)
         if(menuItem != null){
             menuItem.setVisible(false)
         }
 
         if(billMenuItem != null){
             billMenuItem.setVisible(false)
+        }
+
+        if(priceMenuItem != null){
+            priceMenuItem.setVisible(false)
         }
 
         if(user_type!!.equals("supadmin")){
@@ -346,6 +351,10 @@ class ReportActivity : AppCompatActivity() {
 
             if(billMenuItem != null){
                 billMenuItem.setVisible(true)
+            }
+
+            if(priceMenuItem != null){
+                priceMenuItem.setVisible(true)
             }
         }
 
@@ -387,6 +396,10 @@ class ReportActivity : AppCompatActivity() {
                 // send to transport owner
 
                 startActivity(Intent(applicationContext, BillGenerateActivity::class.java))
+                return true
+            }
+            R.id.ticket_price -> {
+                startActivity(Intent(applicationContext, SetPriceActivity::class.java))
                 return true
             }
             R.id.logout -> {

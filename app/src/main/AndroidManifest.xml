@@ -14,6 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".SetPriceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true" />
+        <activity
             android:name=".BillGenerateActivity"
             android:exported="true" />
         <activity

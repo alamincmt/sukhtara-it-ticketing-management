@@ -7,6 +7,9 @@
         android:id="@+id/daily_report"
         android:title="দৈনিক" />
     <item
+        android:id="@+id/ticket_price"
+        android:title="টিকেট প্রাইস" />
+    <item
         android:id="@+id/monthly_report"
         android:title="মাসিক" />
     <item
