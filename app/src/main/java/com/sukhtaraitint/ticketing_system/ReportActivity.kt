@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 var tv_report_type : TextView? = null
 var tv_total_ticket : TextView? = null
@@ -77,6 +78,8 @@ var selectedPos : Int = 0;
 var selectedPosForCounterGroup : Int = 0
 var ticketSoldListener : ValueEventListener? = null
 
+var counterWiseSellReport: HashMap<String, Int>? = null
+
 var isDataCalled : Boolean = false
 
 class ReportActivity : AppCompatActivity() {
@@ -84,6 +87,7 @@ class ReportActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_report)
         counterObjList!!.clear()
+        counterWiseSellReport = hashMapOf<String, Int>()
 
         val toolbar = findViewById(R.id.toolbar) as androidx.appcompat.widget.Toolbar?
         setSupportActionBar(toolbar)
@@ -444,24 +448,26 @@ class ReportActivity : AppCompatActivity() {
     }
 
     private fun saveTotalSoldTicketReport() {
-        val totalTicketSoldReportObj = TotalTicketSoldReport(ticketCount,
-            System.currentTimeMillis(),
-            user_type
-        )
+        if(ticketCount!! > 0){
+            val totalTicketSoldReportObj = TotalTicketSoldReport(counterWiseSellReport, ticketCount,
+                System.currentTimeMillis(),
+                user_type
+            )
 
-        // Write a message to the database
-        val database = Firebase.database(ConstantValues.DB_URL)
-        val ticketSoldReportReference = database.getReference("daily_sell_report")
-        ticketSoldReportReference.keepSynced(true)
+            // Write a message to the database
+            val database = Firebase.database(ConstantValues.DB_URL)
+            val ticketSoldReportReference = database.getReference("daily_sell_report")
+            ticketSoldReportReference.keepSynced(true)
 
-        ticketSoldReportReference.child(createTicketSoldReportID()!!).setValue(totalTicketSoldReportObj)
-            .addOnSuccessListener {
-                Toast.makeText(applicationContext, "Data Successfully Synced. ", Toast.LENGTH_LONG).show()
-                showTicketSoldReportDeleteDialog("Data Successfully Backed Up. You can delete data now.\n\nAre you sure want to delete all data?")
-            }
-            .addOnFailureListener {
-                Toast.makeText(applicationContext, "Data Sync Failed\nPlease try again. ", Toast.LENGTH_LONG).show()
-            }
+            ticketSoldReportReference.child(createTicketSoldReportID()!!).setValue(totalTicketSoldReportObj)
+                .addOnSuccessListener {
+                    Toast.makeText(applicationContext, "Data Successfully Synced. ", Toast.LENGTH_LONG).show()
+                    showTicketSoldReportDeleteDialog("Data Successfully Backed Up. You can delete data now.\n\nAre you sure want to delete all data?")
+                }
+                .addOnFailureListener {
+                    Toast.makeText(applicationContext, "Data Sync Failed\nPlease try again. ", Toast.LENGTH_LONG).show()
+                }
+        }
     }
 
 
@@ -517,6 +523,7 @@ class ReportActivity : AppCompatActivity() {
                                 val ticketSoldCounterSet = snapshot.getValue() as Map<String, *>
                                 for ((key, value) in ticketSoldCounterSet) {
                                     val ticketSoldMap: Map<String, *> = value as Map<String, *>
+                                    var counterSellCount = 0
                                     for ((key1, value1) in ticketSoldMap) {
                                         val ticketSoldSingleMap: Map<String, *> = value1 as Map<String, *>
 
@@ -526,6 +533,7 @@ class ReportActivity : AppCompatActivity() {
                                             ticketSoldSingleMap.get("total_tickets").toString().toInt(), ticketSoldSingleMap.get("date_time").toString().toLong(),
                                             ticketSoldSingleMap.get("sold_by_counter_id").toString())
                                         ticketSoldList!!.add(totalTicketSold!!)
+                                        counterSellCount = counterSellCount + ticketSoldSingleMap.get("total_tickets").toString().toInt()
 
 
                                         if(reportTypeWithCounterType!!.equals("single_counter_wise")){
@@ -839,6 +847,8 @@ class ReportActivity : AppCompatActivity() {
                                             }
                                         }
                                     }
+
+                                    counterWiseSellReport!!.put(key, counterSellCount)
 
                                 }
                             }
