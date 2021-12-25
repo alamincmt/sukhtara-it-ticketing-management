@@ -166,6 +166,7 @@ class ReportActivity : AppCompatActivity() {
                 }
 
                 if(counterList?.size!! > 0){
+                    ConstantValues.counterList = counterObjList
                     counterList?.add(0, "সবগুলো কাউন্টার")
                     if (spinner_counter != null) {
                         val adapter = ArrayAdapter(

@@ -68,6 +68,7 @@ import java.util.concurrent.Executors
 
 var totalTicketCount: Int? = 0
 var perTicketPrice: Double? = 0.14
+var ticketSoldReportCounterWise: TotalTicketSoldReport? = null
 var ticketSoldReportList: MutableList<TotalTicketSoldReport>? = mutableListOf(TotalTicketSoldReport())
 var ticketSoldReportCountObj: ValueEventListener? = null
 
@@ -79,360 +80,40 @@ class BillGenerateActivity : PDFCreatorActivity() {
         val ticketSoldReportRef = database.getReference("daily_sell_report")
         Executors.newSingleThreadExecutor().execute(Runnable {
             runOnUiThread{
-
-                // Get Post object and use the values to update the UI
-                /*totalTicketAmount = 0.0
-                totalTicketCount = 0
-
-                ticketSoldListener = object : ValueEventListener{
+                ticketSoldReportCountObj = object : ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {
                         Log.d("DataSnapshot", snapshot.getValue().toString())
-                        var totalTicketSold : TicketSold? = null
-                        ticketSoldList?.clear()
-
                         if (snapshot.getValue() != null){
                             val ticketSoldCounterSet = snapshot.getValue() as Map<kotlin.String, *>
+                            var totalTicketSoldCount = 0
                             for ((key, value) in ticketSoldCounterSet) {
+
                                 val ticketSoldMap: Map<kotlin.String, *> = value as Map<kotlin.String, *>
-                                for ((key1, value1) in ticketSoldMap) {
-                                    val ticketSoldSingleMap: Map<kotlin.String, *> = value1 as Map<kotlin.String, *>
+                                var counterSellCount = 0
 
-                                    totalTicketSold = TicketSold(ticketSoldSingleMap.get("id").toString().toInt(),
-                                        ticketSoldSingleMap.get("group_counter_id").toString().toInt(), ticketSoldSingleMap.get("from_counter_id").toString(),
-                                        ticketSoldSingleMap.get("to_counter_id").toString(), ticketSoldSingleMap.get("price_total").toString(),
-                                        ticketSoldSingleMap.get("total_tickets").toString().toInt(), ticketSoldSingleMap.get("date_time").toString().toLong(),
-                                        ticketSoldSingleMap.get("sold_by_counter_id").toString())
-                                    ticketSoldList!!.add(totalTicketSold!!)
+                                ticketSoldReportCounterWise = TotalTicketSoldReport(
+                                    hashMapOf(),
+                                    ticketSoldMap.get("total_tickets").toString().toInt(),
+                                    ticketSoldMap.get("date_time").toString().toLong(),
+                                    ticketSoldMap.get("report_taken_by").toString())
+                                ticketSoldReportList!!.add(ticketSoldReportCounterWise!!)
 
-
-                                    if(reportTypeWithCounterType!!.equals("single_counter_wise")){
-                                        if(totalTicketSold != null){
-                                            val cal = Calendar.getInstance()
-                                            cal.timeInMillis = totalTicketSold.date_time!!
-
-                                            val todaysCalendar = Calendar.getInstance()
-                                            todaysCalendar.timeInMillis = System.currentTimeMillis()
-
-                                            val selectedCounterIDInt = getSelectedCounterId(selectedCounterName)
-
-                                            // get daily reports
-                                            if(reportType.equals("daily")){
-                                                var date = Date(System.currentTimeMillis())
-                                                val timeZoneDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-                                                var mobileDateTime = engNumToBangNum(timeZoneDate.format(date))
-                                                tv_report_type!!.setText("দৈনিক - ${mobileDateTime}")
-
-                                                if(todaysCalendar.get(Calendar.DAY_OF_MONTH) == cal.get(Calendar.DAY_OF_MONTH)){
-                                                    if(selectedCounterName != null && selectedCounterName!!.equals("") ||
-                                                        selectedCounterName != null && selectedCounterName!!.equals("সবগুলো কাউন্টার")){
-
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-
-                                                    if(selectedCounterIDInt!!.equals(totalTicketSold.from_counter_id.toString())){
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-                                                }
-                                            }
-
-                                            // get daily reports
-                                            if(reportType.equals("monthly")){
-
-                                                val month: kotlin.String = todaysCalendar.getDisplayName(
-                                                    Calendar.MONTH,
-                                                    Calendar.LONG,
-                                                    Locale.getDefault()
-                                                )
-
-                                                val currentYear : Int = todaysCalendar.get(Calendar.YEAR)
-                                                tv_report_type!!.setText("মাসিক ${month}-${currentYear}")
-                                                if(todaysCalendar.get(Calendar.MONTH) == cal.get(Calendar.MONTH)){
-                                                    if(selectedCounterName != null && selectedCounterName!!.equals("") ||
-                                                        selectedCounterName != null && selectedCounterName!!.equals("সবগুলো কাউন্টার")){
-
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-
-                                                    if(selectedCounterIDInt!!.equals(totalTicketSold.from_counter_id.toString())){
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-                                                }
-                                            }
-
-                                            // get daily reports
-                                            if(reportType.equals("all")){
-                                                tv_report_type!!.setText("সব")
-                                                if(selectedCounterName != null && selectedCounterName!!.equals("") ||
-                                                    selectedCounterName != null && selectedCounterName!!.equals("সবগুলো কাউন্টার")){
-
-                                                    // get total ticket sold + total ammount
-                                                    totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                    ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                    tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                    tv_total_ticket?.setText(
-                                                        "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                            "" + ticketCount
-                                                        )
-                                                    )
-                                                }
-
-                                                if(selectedCounterName!!.equals(counterList!!.get(selectedPos))){
-                                                    // get total ticket sold + total ammount
-                                                    totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                    ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                    tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                    tv_total_ticket?.setText(
-                                                        "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                            "" + ticketCount
-                                                        )
-                                                    )
-                                                }
-                                            }
-
-                                            if(reportType.equals("date_range")){
-                                                if(startDateTime!! <= totalTicketSold.date_time!! && endDateTime!! >= totalTicketSold.date_time!!){
-                                                    if(selectedCounterName != null && selectedCounterName!!.equals("") ||
-                                                        selectedCounterName != null && selectedCounterName!!.equals("সবগুলো কাউন্টার")){
-
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-
-                                                    if(selectedCounterIDInt!!.equals(totalTicketSold.from_counter_id.toString())){
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }else if(reportTypeWithCounterType!!.equals("group_counter_wise")){
-                                        if(totalTicketSold != null){
-                                            val cal = Calendar.getInstance()
-                                            cal.timeInMillis = totalTicketSold.date_time!!
-
-                                            val todaysCalendar = Calendar.getInstance()
-                                            todaysCalendar.timeInMillis = System.currentTimeMillis()
-
-                                            val selectedCounterIDInt = getSelectedCounterGroupId(selectedGroupID)
-
-                                            // get daily reports
-                                            if(reportType.equals("daily")){
-                                                var date = Date(System.currentTimeMillis())
-                                                val timeZoneDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-                                                var mobileDateTime = engNumToBangNum(timeZoneDate.format(date))
-                                                tv_report_type!!.setText("দৈনিক - ${mobileDateTime}")
-
-                                                if(todaysCalendar.get(Calendar.DAY_OF_MONTH) == cal.get(Calendar.DAY_OF_MONTH)){
-                                                    if(selectedGroupID != null && selectedGroupID!!.equals("") ||
-                                                        selectedGroupID != null && selectedGroupID!!.equals("সবগুলো কাউন্টার")){
-
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-
-                                                    if(selectedCounterIDInt!!.equals(totalTicketSold.group_counter_id.toString())){
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-                                                }
-                                            }
-
-                                            // get daily reports
-                                            if(reportType.equals("monthly")){
-
-                                                val month: kotlin.String = todaysCalendar.getDisplayName(
-                                                    Calendar.MONTH,
-                                                    Calendar.LONG,
-                                                    Locale.getDefault()
-                                                )
-
-                                                val currentYear : Int = todaysCalendar.get(Calendar.YEAR)
-                                                tv_report_type!!.setText("মাসিক ${month}-${currentYear}")
-                                                if(todaysCalendar.get(Calendar.MONTH) == cal.get(Calendar.MONTH)){
-                                                    if(selectedGroupID != null && selectedGroupID!!.equals("") ||
-                                                        selectedGroupID != null && selectedGroupID!!.equals("সবগুলো কাউন্টার")){
-
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-
-                                                    if(selectedCounterIDInt!!.equals(totalTicketSold.group_counter_id.toString())){
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-                                                }
-                                            }
-
-                                            // get daily reports
-                                            if(reportType.equals("all")){
-                                                tv_report_type!!.setText("সব")
-                                                if(selectedGroupID != null && selectedGroupID!!.equals("") ||
-                                                    selectedGroupID != null && selectedGroupID!!.equals("সবগুলো কাউন্টার")){
-
-                                                    // get total ticket sold + total ammount
-                                                    totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                    ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                    tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                    tv_total_ticket?.setText(
-                                                        "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                            "" + ticketCount
-                                                        )
-                                                    )
-                                                }
-
-                                                if(selectedGroupID!!.equals(counterGroupList!!.get(
-                                                        selectedPosForCounterGroup))){
-                                                    // get total ticket sold + total ammount
-                                                    totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                    ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                    tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                    tv_total_ticket?.setText(
-                                                        "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                            "" + ticketCount
-                                                        )
-                                                    )
-                                                }
-                                            }
-
-                                            if(reportType.equals("date_range")){
-                                                if(startDateTime!! <= totalTicketSold.date_time!! && endDateTime!! >= totalTicketSold.date_time!!){
-                                                    if(selectedGroupID != null && selectedGroupID!!.equals("") ||
-                                                        selectedGroupID != null && selectedGroupID!!.equals("সবগুলো কাউন্টার")){
-
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-
-                                                    if(selectedCounterIDInt!!.equals(totalTicketSold.group_counter_id.toString())){
-                                                        // get total ticket sold + total ammount
-                                                        totalTicketAmount = totalTicketAmount!! + totalTicketSold.price_total!!.toDouble()
-                                                        ticketCount = ticketCount!! + totalTicketSold.total_tickets!!.toInt()
-
-                                                        tv_total_amount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount) + " টাকা")
-                                                        tv_total_ticket?.setText(
-                                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
-                                                                "" + ticketCount
-                                                            )
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                totalTicketSoldCount = totalTicketSoldCount + ticketSoldMap.get("total_tickets").toString().toInt()
 
                             }
                         }
 
-                        calculateBill()
-                        ticketSoldRef.removeEventListener(ticketSoldListener!!)
+                        ticketSoldReportRef.removeEventListener(ticketSoldReportCountObj!!)
 
                     }
 
                     override fun onCancelled(error: DatabaseError) {
                         TODO("Not yet implemented")
+                        Log.d("DataSnapshot", error.toString())
                     }
 
                 }
-
-                calculateBill()
-                ticketSoldReportRef.addValueEventListener(ticketSoldListener!!)*/
+                ticketSoldReportRef.addValueEventListener(ticketSoldReportCountObj!!)
             }
         })
 
@@ -450,11 +131,9 @@ class BillGenerateActivity : PDFCreatorActivity() {
             override fun pdfGenerationFailure(exception: Exception?) {
                 TODO("Not yet implemented")
             }
-
         }
-        createPDF("Billing", pdfUtilListener)
 
-//        setContentView(R.layout.activity_bill_generate)
+        createPDF("Billing", pdfUtilListener)
     }
 
     override fun getHeaderView(pageIndex: Int): PDFHeaderView? {
