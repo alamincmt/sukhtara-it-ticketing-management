@@ -30,6 +30,11 @@
             android:name=".SetPriceActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="true" />
+
+        <activity
+            android:name=".PaperRollEmptyActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true" />
         <activity
             android:name=".BillGenerateActivity"
             android:exported="true" />

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.sukhtaraitint.ticketing_system.PaperRollEmptyActivity
 import org.json.JSONObject
 import java.lang.Exception
 
@@ -24,6 +25,10 @@ class PrinterStatusReceiver : BroadcastReceiver() {
 //        val result = PluginResult(PluginResult.Status.OK, jsonObj)
 //        result.setKeepCallback(true)
 //        callbackReceive.sendPluginResult(result)
+
+        if(action != null && !action.equals("") && action.equals("woyou.aidlservice.jiuv5.OUT_OF_PAPER_ACTION")){
+            context.startActivity(Intent(context, PaperRollEmptyActivity::class.java))
+        }
     } catch (e: Exception) {
         Log.i(TAG, "ERROR: " + e.message)
     }
