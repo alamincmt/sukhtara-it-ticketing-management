@@ -204,6 +204,7 @@ class BillGenerateActivity : PDFCreatorActivity() {
         pdfBody.addView(pdfTableTitleView)
 //        val pdfPageBreakView = PDFPageBreakView(applicationContext)
 //        pdfBody.addView(pdfPageBreakView)
+
         val tableHeader = PDFTableRowView(applicationContext)
         for (s in textInTable) {
             val pdfTextView = PDFTextView(applicationContext, PDFTextView.PDF_TEXT_SIZE.P)
@@ -218,11 +219,14 @@ class BillGenerateActivity : PDFCreatorActivity() {
             pdfTextView.setText("Row 1 : $s")
             tableRowView1.addToRow(pdfTextView)
         }
+
         val tableView = PDFTableView(applicationContext, tableHeader, tableRowView1)
         for (i in 0..7) {
             // Create 10 rows
+
+                // todo: need to do the task here.
             val tableRowView = PDFTableRowView(applicationContext)
-            for (s in textInTable) {
+            for (s in ticketSoldReportList!!) {
                 val pdfTextView = PDFTextView(applicationContext, PDFTextView.PDF_TEXT_SIZE.P)
                 pdfTextView.setText("Row " + (i + 2) + ": " + s)
                 tableRowView.addToRow(pdfTextView)
