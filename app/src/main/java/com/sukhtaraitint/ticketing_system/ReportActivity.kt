@@ -4,10 +4,12 @@ import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -395,6 +397,10 @@ class ReportActivity : AppCompatActivity() {
             R.id.daily_report -> {
                 reportType = "daily"
 //                updateTodaysData(reportType!!, reportTypeWithCounterType!!)
+                return true
+            }
+            R.id.add_others_amount -> {
+                showOtherAmountDialog()
                 return true
             }
             R.id.monthly_report -> {
@@ -1011,5 +1017,40 @@ class ReportActivity : AppCompatActivity() {
         } else {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, todayMidnight.timeInMillis, alarmPendingIntent)
         }
+    }
+
+    fun showOtherAmountDialog(){
+        val inflater = LayoutInflater.from(this)
+        val view: View = inflater.inflate(R.layout.popup_form, null)
+        val alertDialogBuilder = AlertDialog.Builder(this)
+        alertDialogBuilder.setView(view)
+
+        val mEtDesc = view.findViewById(R.id.et_description) as EditText
+        val mEtAmount = view.findViewById(R.id.et_amount) as EditText
+
+        alertDialogBuilder.setCancelable(false)
+            .setPositiveButton("OK") { dialog, id ->
+            }
+            .setNegativeButton(
+                "Cancel"
+            ) { dialog, id -> dialog.cancel() }
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
+        val theButton = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+        theButton.setOnClickListener({
+            if(mEtDesc != null && mEtAmount != null){
+                if(!mEtAmount.text.trim().toString().equals("") && !mEtDesc.text.trim().toString().equals("")){
+                    ConstantValues.otherAmountDesc = mEtDesc.text.trim().toString()
+                    ConstantValues.otherAmount = mEtAmount.text.trim().toString().toDouble() + 0.0
+
+                }else{
+                    Toast.makeText(this,
+                        "Please try with required data. "
+                        , Toast.LENGTH_LONG).show()
+                }
+
+                alertDialog.dismiss()
+            }
+        })
     }
 }

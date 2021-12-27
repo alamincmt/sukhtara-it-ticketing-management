@@ -5,9 +5,6 @@
         android:visible="false"
         android:title="Add Ticket Price Rate" />
     <item
-        android:id="@+id/add_others_amount"
-        android:title="Add Other Amount" />
-    <item
         android:id="@+id/download_pdf_of_bill"
         android:title="Download PDF" />
 </menu>

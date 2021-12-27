@@ -9,4 +9,6 @@ object ConstantValues {
     var counterList: List<Counters>? = null
     var ticketSoldReportList: List<TotalTicketSoldReport>? = null
     var perTicketPrice = 0.14
+    var otherAmount = 0.0
+    var otherAmountDesc = ""
 }
