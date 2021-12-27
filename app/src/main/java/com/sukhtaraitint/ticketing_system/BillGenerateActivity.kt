@@ -1,9 +1,7 @@
 package com.sukhtaraitint.ticketing_system
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import com.tejpratapsingh.pdfcreator.activity.PDFCreatorActivity
 import com.tejpratapsingh.pdfcreator.utils.PDFUtil
 import com.tejpratapsingh.pdfcreator.views.PDFBody
@@ -16,21 +14,11 @@ import android.text.Html
 import android.text.Spanned
 
 import com.tejpratapsingh.pdfcreator.views.basic.PDFTextView
-import android.content.Intent
 import android.net.Uri
-import com.tejpratapsingh.pdfcreator.activity.PDFViewerActivity
-import android.R
+import android.content.DialogInterface
 import android.graphics.Color
 
-import android.view.Gravity
-
-import android.view.ViewGroup
-
-import android.widget.FrameLayout
-
 import com.tejpratapsingh.pdfcreator.views.basic.PDFImageView
-
-import android.widget.LinearLayout
 
 import androidx.core.text.HtmlCompat
 
@@ -41,14 +29,17 @@ import com.tejpratapsingh.pdfcreator.views.PDFTableView
 import com.tejpratapsingh.pdfcreator.views.basic.PDFPageBreakView
 
 import android.graphics.Typeface
+import android.os.Environment
 
 import android.text.Spannable
 
 import android.text.style.ForegroundColorSpan
 
 import android.text.SpannableString
-import android.widget.ImageView
+import android.view.*
+import android.widget.*
 import androidx.annotation.Nullable
+import androidx.appcompat.app.AlertDialog
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -60,38 +51,47 @@ import com.sukhtaraitint.ticketing_system.utils.ConstantValues
 import com.tejpratapsingh.pdfcreator.views.PDFTableView.PDFTableRowView
 
 import com.tejpratapsingh.pdfcreator.views.basic.PDFHorizontalView
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
 import java.lang.String
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import android.widget.EditText
+import android.view.LayoutInflater
 
 
 var totalTicketCount: Int? = 0
 var perTicketPrice: Double? = 0.14
+var pdfUri: Uri? = null
 
 class BillGenerateActivity : PDFCreatorActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        perTicketPrice = ConstantValues.perTicketPrice
+
         val pdfUtilListener: PDFUtil.PDFUtilListener = object : PDFUtil.PDFUtilListener {
             override fun pdfGenerationSuccess(savedPDFFile: File?) {
                 Log.d("PDFCreatorActivity", "PDF file created: " + savedPDFFile!!.absolutePath.toString())
-                val pdfUri: Uri = Uri.fromFile(savedPDFFile)
+                pdfUri = Uri.fromFile(savedPDFFile)
 
-                val intentPdfViewer = Intent(applicationContext, PDFViewerActivity::class.java)
+                /*val intentPdfViewer = Intent(applicationContext, PDFViewerActivity::class.java)
                 intentPdfViewer.putExtra(PDFViewerActivity.PDF_FILE_URI, pdfUri)
 
-                startActivity(intentPdfViewer)
+                startActivity(intentPdfViewer)*/
             }
 
             override fun pdfGenerationFailure(exception: Exception?) {
-                TODO("Not yet implemented")
+                Toast.makeText(applicationContext, "Problem Occurred. " + exception!!.localizedMessage, Toast.LENGTH_LONG).show()
             }
         }
 
-        createPDF("Billing", pdfUtilListener)
+        createPDF( "SIT_Billing_" + getBanglaDateFromMillis(System.currentTimeMillis()), pdfUtilListener)
     }
 
     override fun getHeaderView(pageIndex: Int): PDFHeaderView? {
@@ -155,7 +155,7 @@ class BillGenerateActivity : PDFCreatorActivity() {
         val lineSeparatorView3 =
             PDFLineSeparatorView(applicationContext).setBackgroundColor(Color.WHITE)
         pdfBody.addView(lineSeparatorView3)
-        val widthPercent = intArrayOf(20, 25, 15, 20, 20) // Sum should be equal to 100%
+        val widthPercent = intArrayOf(22, 23, 15, 20, 20) // Sum should be equal to 100%
         val textInTable = arrayOf("তারিখঃ", "বিবরণঃ", "টিকেট বিক্রয়ঃ", "প্রতি টিকেট বিলঃ","মোট বিলঃ")
         val pdfTableTitleView = PDFTextView(applicationContext, PDFTextView.PDF_TEXT_SIZE.P)
         pdfTableTitleView.setText("Total Ticket Sell Report\n\n")
@@ -257,11 +257,119 @@ class BillGenerateActivity : PDFCreatorActivity() {
     }
 
     override fun onNextClicked(savedPDFFile: File?) {
-        val pdfUri = Uri.fromFile(savedPDFFile)
+        // todo: add download feature here.
+        /*val pdfUri = Uri.fromFile(savedPDFFile)
         val intentPdfViewer =
             Intent(this@BillGenerateActivity, PDFViewerActivity::class.java)
         intentPdfViewer.putExtra(PDFViewerActivity.PDF_FILE_URI, pdfUri)
-        startActivity(intentPdfViewer)
+        startActivity(intentPdfViewer)*/
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(com.sukhtaraitint.ticketing_system.R.menu.menu_bill_generate, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == R.id.home) {
+            onBackPressed()
+            return true
+        }
+
+        return when (item.itemId) {
+            R.id.add_ticket_price_rate -> {
+                showTicketPriceRateDialog()
+                true
+            }
+            R.id.add_others_amount -> {
+                showOtherAmountDialog()
+                return true
+            }
+            R.id.download_pdf_of_bill -> {
+
+
+                val path = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/SIT-Ticketing/"
+                val dir = File(path)
+                if (!dir.exists()) dir.mkdirs()
+
+                val destFilePath = File(dir, "SIT_Billing_" + getBanglaDateFromMillis(System.currentTimeMillis()) + ".pdf")
+                if(!destFilePath.exists()){
+                    destFilePath.createNewFile()
+                }
+
+                moveFile(File(pdfUri!!.path), dir)
+                Toast.makeText(applicationContext, "File saved in " + destFilePath!!.path, Toast.LENGTH_LONG).show()
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun showTicketPriceRateDialog(){
+        val alert =  AlertDialog.Builder(this)
+        val edittext = EditText(this)
+        edittext.hint = "Enter Name"
+        edittext.maxLines = 1
+
+        val layout = FrameLayout(this)
+//set padding in parent layout
+        layout.setPaddingRelative(45,15,45,0)
+        alert.setTitle(title)
+        layout.addView(edittext)
+        alert.setView(layout)
+
+        alert.setPositiveButton("Save", DialogInterface.OnClickListener {
+                dialog, which ->
+                run {
+
+                    val perTicketPriceTxt = edittext.text.toString()
+                    if(perTicketPriceTxt != null && !perTicketPriceTxt.equals("")){
+                        perTicketPrice = perTicketPriceTxt.toString().toDouble()
+                    }else{
+                        Toast.makeText(applicationContext, "Please enter correct value. ", Toast.LENGTH_LONG).show()
+                    }
+
+                }
+
+        })
+        alert.setNegativeButton("No", DialogInterface.OnClickListener {
+                dialog, which ->
+                run {
+                    alert.create().dismiss()
+                }
+        })
+
+        alert.show()
+    }
+
+    fun showOtherAmountDialog(){
+        val inflater = LayoutInflater.from(this)
+        val view: View = inflater.inflate(R.layout.popup_form, null)
+        val alertDialogBuilder = AlertDialog.Builder(this)
+        alertDialogBuilder.setView(view)
+
+        val mEtDesc = view.findViewById(R.id.et_description) as EditText
+        val mEtAmount = view.findViewById(R.id.et_amount) as EditText
+
+        alertDialogBuilder.setCancelable(false)
+            .setPositiveButton("OK") { dialog, id ->
+            }
+            .setNegativeButton(
+                "Cancel"
+            ) { dialog, id -> dialog.cancel() }
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
+        val theButton = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+        theButton.setOnClickListener({
+            if(mEtDesc != null && mEtAmount != null){
+                Toast.makeText(this,
+                    "Amount: " + mEtAmount.text.trim().toString()+
+                    "Description: " + mEtDesc.text.trim().toString()
+                    , Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
     fun engNumToBangNum(i: kotlin.String): kotlin.String? {
@@ -279,5 +387,24 @@ class BillGenerateActivity : PDFCreatorActivity() {
         val timeZoneDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         var mobileDateTime = engNumToBangNum(timeZoneDate.format(date))
         return mobileDateTime
+    }
+
+    @Throws(IOException::class)
+    fun moveFile(srcFileOrDirectory: File, desFileOrDirectory: File?) {
+        val newFile = File(desFileOrDirectory, srcFileOrDirectory.name)
+        FileOutputStream(newFile).getChannel().use { outputChannel ->
+            FileInputStream(srcFileOrDirectory).getChannel().use { inputChannel ->
+                inputChannel.transferTo(0, inputChannel.size(), outputChannel)
+                inputChannel.close()
+                deleteRecursive(srcFileOrDirectory)
+            }
+        }
+    }
+
+    private fun deleteRecursive(fileOrDirectory: File) {
+        if (fileOrDirectory.isDirectory) for (child in Objects.requireNonNull(fileOrDirectory.listFiles())) deleteRecursive(
+            child
+        )
+        fileOrDirectory.delete()
     }
 }

@@ -1,8 +1,11 @@
 package com.sukhtaraitint.ticketing_system
 
+import android.app.AlarmManager
 import android.app.DatePickerDialog
+import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -22,6 +25,7 @@ import com.sukhtaraitint.ticketing_system.models.CounterGroups
 import com.sukhtaraitint.ticketing_system.models.Counters
 import com.sukhtaraitint.ticketing_system.models.TicketSold
 import com.sukhtaraitint.ticketing_system.models.TotalTicketSoldReport
+import com.sukhtaraitint.ticketing_system.receivers.AlarmBroadcastReceiver
 import com.sukhtaraitint.ticketing_system.utils.ConstantValues
 import com.sukhtaraitint.ticketing_system.utils.ProgressDialog
 import java.text.SimpleDateFormat
@@ -142,11 +146,17 @@ class ReportActivity : AppCompatActivity() {
             et_price!!.visibility = View.GONE
         }
 
+        if(et_price != null){
+            ConstantValues.perTicketPrice = et_price!!.text.toString().trim().toDouble()
+        }
+
         populateCounterList()
 
         populateCounterGroupList()
 
         getTicketSoldReportList()
+
+        setAlarmForDataBackupAndDelete()
 
 //        updateTodaysData("daily", reportTypeWithCounterType!!)
     }
@@ -304,6 +314,7 @@ class ReportActivity : AppCompatActivity() {
         }
 
         button_refresh_report!!.setOnClickListener {
+            ConstantValues.perTicketPrice = et_price!!.text.toString().trim().toDouble()
             updateTodaysData(reportType!!, reportTypeWithCounterType!!)
         }
     }
@@ -964,5 +975,41 @@ class ReportActivity : AppCompatActivity() {
                 if (valueOf[i2] == '1') str + "১" else if (valueOf[i2] == '2') str + "২" else if (valueOf[i2] == '3') str + "৩" else if (valueOf[i2] == '4') str + "৪" else if (valueOf[i2] == '5') str + "৫" else if (valueOf[i2] == '6') str + "৬" else if (valueOf[i2] == '7') str + "৭" else if (valueOf[i2] == '8') str + "৮" else if (valueOf[i2] == '9') str + "৯" else if (valueOf[i2] == '0') str + "০" else str + valueOf[i2]
         }
         return str
+    }
+
+    fun setAlarmForDataBackupAndDelete(){
+        val alarmManager = applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
+        val intent = Intent(applicationContext, AlarmBroadcastReceiver::class.java)
+        intent.putExtra("TITLE", "Data Back up And Delete ...")
+        intent.putExtra("requestCode", 100)
+
+        val alarmPendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            100 as Int,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        //Show alarm in exact Time....
+
+        // Create a calendar for midnight
+        // Create a calendar for midnight
+        val todayMidnight = Calendar.getInstance()
+        todayMidnight.add(Calendar.DATE, 1)
+        todayMidnight[Calendar.HOUR_OF_DAY] = 0
+        todayMidnight[Calendar.MINUTE] = 0
+        todayMidnight[Calendar.SECOND] = 0
+
+        //Show alarm in exact Time....
+        alarmManager.setWindow(AlarmManager.RTC_WAKEUP, todayMidnight.timeInMillis, 100.toLong(), alarmPendingIntent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                todayMidnight.timeInMillis,
+                alarmPendingIntent
+            )
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, todayMidnight.timeInMillis, alarmPendingIntent)
+        }
     }
 }

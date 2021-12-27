@@ -8,4 +8,5 @@ object ConstantValues {
     const val DB_URL = "https://sukhtara-it-default-rtdb.asia-southeast1.firebasedatabase.app/"
     var counterList: List<Counters>? = null
     var ticketSoldReportList: List<TotalTicketSoldReport>? = null
+    var perTicketPrice = 0.14
 }
