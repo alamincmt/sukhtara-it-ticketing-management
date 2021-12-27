@@ -61,6 +61,7 @@ import com.tejpratapsingh.pdfcreator.views.PDFTableView.PDFTableRowView
 
 import com.tejpratapsingh.pdfcreator.views.basic.PDFHorizontalView
 import java.lang.String
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
@@ -68,54 +69,11 @@ import java.util.concurrent.Executors
 
 var totalTicketCount: Int? = 0
 var perTicketPrice: Double? = 0.14
-var ticketSoldReportCounterWise: TotalTicketSoldReport? = null
-var ticketSoldReportList: MutableList<TotalTicketSoldReport>? = mutableListOf(TotalTicketSoldReport())
-var ticketSoldReportCountObj: ValueEventListener? = null
 
 class BillGenerateActivity : PDFCreatorActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val database = Firebase.database(ConstantValues.DB_URL)
-        val ticketSoldReportRef = database.getReference("daily_sell_report")
-        Executors.newSingleThreadExecutor().execute(Runnable {
-            runOnUiThread{
-                ticketSoldReportCountObj = object : ValueEventListener{
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        Log.d("DataSnapshot", snapshot.getValue().toString())
-                        if (snapshot.getValue() != null){
-                            val ticketSoldCounterSet = snapshot.getValue() as Map<kotlin.String, *>
-                            var totalTicketSoldCount = 0
-                            for ((key, value) in ticketSoldCounterSet) {
-
-                                val ticketSoldMap: Map<kotlin.String, *> = value as Map<kotlin.String, *>
-                                var counterSellCount = 0
-
-                                ticketSoldReportCounterWise = TotalTicketSoldReport(
-                                    hashMapOf(),
-                                    ticketSoldMap.get("total_tickets").toString().toInt(),
-                                    ticketSoldMap.get("date_time").toString().toLong(),
-                                    ticketSoldMap.get("report_taken_by").toString())
-                                ticketSoldReportList!!.add(ticketSoldReportCounterWise!!)
-
-                                totalTicketSoldCount = totalTicketSoldCount + ticketSoldMap.get("total_tickets").toString().toInt()
-
-                            }
-                        }
-
-                        ticketSoldReportRef.removeEventListener(ticketSoldReportCountObj!!)
-
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        TODO("Not yet implemented")
-                        Log.d("DataSnapshot", error.toString())
-                    }
-
-                }
-                ticketSoldReportRef.addValueEventListener(ticketSoldReportCountObj!!)
-            }
-        })
 
         val pdfUtilListener: PDFUtil.PDFUtilListener = object : PDFUtil.PDFUtilListener {
             override fun pdfGenerationSuccess(savedPDFFile: File?) {
@@ -197,10 +155,10 @@ class BillGenerateActivity : PDFCreatorActivity() {
         val lineSeparatorView3 =
             PDFLineSeparatorView(applicationContext).setBackgroundColor(Color.WHITE)
         pdfBody.addView(lineSeparatorView3)
-        val widthPercent = intArrayOf(20, 20, 20, 40) // Sum should be equal to 100%
+        val widthPercent = intArrayOf(20, 25, 15, 20, 20) // Sum should be equal to 100%
         val textInTable = arrayOf("তারিখঃ", "বিবরণঃ", "টিকেট বিক্রয়ঃ", "প্রতি টিকেট বিলঃ","মোট বিলঃ")
         val pdfTableTitleView = PDFTextView(applicationContext, PDFTextView.PDF_TEXT_SIZE.P)
-        pdfTableTitleView.setText("Total Ticket Sell Report")
+        pdfTableTitleView.setText("Total Ticket Sell Report\n\n")
         pdfBody.addView(pdfTableTitleView)
 //        val pdfPageBreakView = PDFPageBreakView(applicationContext)
 //        pdfBody.addView(pdfPageBreakView)
@@ -216,23 +174,43 @@ class BillGenerateActivity : PDFCreatorActivity() {
         val tableRowView1 = PDFTableRowView(applicationContext)
         for (s in textInTable) {
             val pdfTextView = PDFTextView(applicationContext, PDFTextView.PDF_TEXT_SIZE.P)
-            pdfTextView.setText("Row 1 : $s")
+            pdfTextView.setText("---")
             tableRowView1.addToRow(pdfTextView)
         }
 
         val tableView = PDFTableView(applicationContext, tableHeader, tableRowView1)
-        for (i in 0..7) {
-            // Create 10 rows
+        var totalBill: Double = 0.0
+        for (i in 0..ConstantValues.ticketSoldReportList!!.size-1) {
 
-                // todo: need to do the task here.
             val tableRowView = PDFTableRowView(applicationContext)
-            for (s in ticketSoldReportList!!) {
+            for (s in 0..ConstantValues.ticketSoldReportList!!.size-1) {
                 val pdfTextView = PDFTextView(applicationContext, PDFTextView.PDF_TEXT_SIZE.P)
-                pdfTextView.setText("Row " + (i + 2) + ": " + s)
+                val df = DecimalFormat("#")
+                if(ConstantValues.ticketSoldReportList!![i] != null && ConstantValues.ticketSoldReportList!![i].date_time != null){
+                    if(s == 0){
+                        pdfTextView.setText("" + getBanglaDateFromMillis((ConstantValues.ticketSoldReportList!![i].date_time)) + "\n")
+                    }else if(s == 1){
+                        pdfTextView.setText("দৈনিক টিকেট বিক্রয়"  + "\n")
+                    }else if (s == 2){
+                        pdfTextView.setText("" + engNumToBangNum( "" + (ConstantValues.ticketSoldReportList!![i].total_tickets))  + "\n")
+                    }else if (s == 3){
+                        pdfTextView.setText(engNumToBangNum("" + perTicketPrice)  + "\n")
+                    }else if (s == 4){
+                        var priceTotal = (perTicketPrice!!.toDouble() * ConstantValues.ticketSoldReportList!![i].total_tickets!!.toDouble())
+                        pdfTextView.setText("" + engNumToBangNum("${df.format(priceTotal)}") + "\n")
+                        totalBill += (perTicketPrice!!.toDouble() * ConstantValues.ticketSoldReportList!![i].total_tickets!!.toDouble())
+                    }
+                }else{
+                    pdfTextView.setText("---")
+                }
+
                 tableRowView.addToRow(pdfTextView)
             }
             tableView.addRow(tableRowView)
         }
+
+        Log.d("BillGenerateActivity", " Total Bill " + totalBill )
+
         tableView.setColumnWidth(*widthPercent)
         pdfBody.addView(tableView)
 
@@ -241,7 +219,7 @@ class BillGenerateActivity : PDFCreatorActivity() {
         pdfBody.addView(lineSeparatorView4)
         val pdfIconLicenseView = PDFTextView(applicationContext, PDFTextView.PDF_TEXT_SIZE.H3)
         val icon8Link = HtmlCompat.fromHtml(
-            "Bill Generated By: <a href='https://sukhtaraintltd.com'>https://sukhtaraintltd.com</a>",
+            "<br/>Bill Generated By: <a href='https://sukhtaraintltd.com'>https://sukhtaraintltd.com</a>",
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
         pdfIconLicenseView.view.text = icon8Link
@@ -284,5 +262,22 @@ class BillGenerateActivity : PDFCreatorActivity() {
             Intent(this@BillGenerateActivity, PDFViewerActivity::class.java)
         intentPdfViewer.putExtra(PDFViewerActivity.PDF_FILE_URI, pdfUri)
         startActivity(intentPdfViewer)
+    }
+
+    fun engNumToBangNum(i: kotlin.String): kotlin.String? {
+        val valueOf = i
+        var str = ""
+        for (i2 in 0 until valueOf.length) {
+            str =
+                if (valueOf[i2] == '1') str + "১" else if (valueOf[i2] == '2') str + "২" else if (valueOf[i2] == '3') str + "৩" else if (valueOf[i2] == '4') str + "৪" else if (valueOf[i2] == '5') str + "৫" else if (valueOf[i2] == '6') str + "৬" else if (valueOf[i2] == '7') str + "৭" else if (valueOf[i2] == '8') str + "৮" else if (valueOf[i2] == '9') str + "৯" else if (valueOf[i2] == '0') str + "০" else str + valueOf[i2]
+        }
+        return str
+    }
+
+    fun getBanglaDateFromMillis(timeInMillis: Long?) : kotlin.String?{
+        var date = Date(timeInMillis!!)
+        val timeZoneDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        var mobileDateTime = engNumToBangNum(timeZoneDate.format(date))
+        return mobileDateTime
     }
 }

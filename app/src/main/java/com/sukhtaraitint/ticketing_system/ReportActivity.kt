@@ -74,7 +74,11 @@ var counterObjList : ArrayList<Counters>? = ArrayList<Counters>()
 var counterGroupList : ArrayList<String>? = ArrayList<String>()
 var counterGroupObjList : ArrayList<CounterGroups>? = ArrayList<CounterGroups>()
 
-var selectedPos : Int = 0;
+var ticketSoldReportCounterWise: TotalTicketSoldReport? = null
+var ticketSoldReportCountObj: ValueEventListener? = null
+var ticketSoldReportList: MutableList<TotalTicketSoldReport>? = mutableListOf(TotalTicketSoldReport())
+
+var selectedPos : Int = 0
 var selectedPosForCounterGroup : Int = 0
 var ticketSoldListener : ValueEventListener? = null
 
@@ -141,6 +145,8 @@ class ReportActivity : AppCompatActivity() {
         populateCounterList()
 
         populateCounterGroupList()
+
+        getTicketSoldReportList()
 
 //        updateTodaysData("daily", reportTypeWithCounterType!!)
     }
@@ -471,7 +477,52 @@ class ReportActivity : AppCompatActivity() {
         }
     }
 
+    private fun getTicketSoldReportList(){
+        val database = Firebase.database(ConstantValues.DB_URL)
+        val ticketSoldReportRef = database.getReference("daily_sell_report")
+        Executors.newSingleThreadExecutor().execute(Runnable {
+            runOnUiThread{
+                ticketSoldReportCountObj = object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        Log.d("DataSnapshot", snapshot.getValue().toString())
+                        if (snapshot.getValue() != null){
+                            val ticketSoldCounterSet = snapshot.getValue() as Map<kotlin.String, *>
+                            var totalTicketSoldCount = 0
+                            for ((key, value) in ticketSoldCounterSet) {
 
+                                val ticketSoldMap: Map<kotlin.String, *> = value as Map<kotlin.String, *>
+                                var counterSellCount = 0
+
+                                ticketSoldReportCounterWise = TotalTicketSoldReport(
+                                    hashMapOf(),
+                                    ticketSoldMap.get("total_tickets").toString().toInt(),
+                                    ticketSoldMap.get("date_time").toString().toLong(),
+                                    ticketSoldMap.get("report_taken_by").toString())
+                                ticketSoldReportList!!.add(ticketSoldReportCounterWise!!)
+
+                                totalTicketSoldCount = totalTicketSoldCount + ticketSoldMap.get("total_tickets").toString().toInt()
+
+                            }
+
+                            if(ticketSoldReportList != null && ticketSoldReportList!!.size > 0){
+                                ConstantValues.ticketSoldReportList =  ticketSoldReportList
+                            }
+                        }
+
+                        ticketSoldReportRef.removeEventListener(ticketSoldReportCountObj!!)
+
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                        Log.d("DataSnapshot", error.toString())
+                    }
+
+                }
+                ticketSoldReportRef.addValueEventListener(ticketSoldReportCountObj!!)
+            }
+        })
+    }
 
     @Throws(Exception::class)
     fun createTicketSoldReportID(): String? {
