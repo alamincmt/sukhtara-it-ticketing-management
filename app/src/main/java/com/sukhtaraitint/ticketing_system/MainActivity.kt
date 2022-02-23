@@ -25,9 +25,6 @@ import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
-import com.sukhtaraitint.ticketing_system.models.Admins
-import com.sukhtaraitint.ticketing_system.models.Counters
-import com.sukhtaraitint.ticketing_system.models.TicketSold
 import com.sukhtaraitint.ticketing_system.utils.ConstantValues
 import com.sunmi.peripheral.printer.WoyouConsts
 import woyou.aidlservice.jiuiv5.ICallback
@@ -43,7 +40,11 @@ import android.os.IBinder
 import android.content.ComponentName
 
 import android.content.ServiceConnection
-import com.sukhtaraitint.ticketing_system.models.CounterWiseTicketPrice
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.sukhtaraitint.ticketing_system.adapters.CounterGroupAdapter
+import com.sukhtaraitint.ticketing_system.listeners.OnItemClickListener
+import com.sukhtaraitint.ticketing_system.models.*
 import com.sukhtaraitint.ticketing_system.receivers.PrinterStatusReceiver
 
 
@@ -91,9 +92,18 @@ class MainActivity : AppCompatActivity() {
     var ll_print : LinearLayout? = null
 
     var counterList : ArrayList<String>? = ArrayList<String>()
-    private var mWebView: WebView? = null
+
+    private var chbx_student_fare: CheckBox? = null
+    private var ll_student_fare: LinearLayout? = null
+
+    private var rcvCounterGroup: RecyclerView? = null
+    private var counterGroupAdapter: CounterGroupAdapter? = null
+
     var printMe : PrintMe? = null
     var ticketSoldObjct : TicketSold? = null
+
+    var counterGroupList : ArrayList<String>? = ArrayList<String>()
+    var counterGroupObjList : ArrayList<CounterGroups>? = ArrayList<CounterGroups>()
 
     private var woyouService: IWoyouService? = null
     private val printerStatusReceiver: PrinterStatusReceiver = PrinterStatusReceiver()
@@ -162,6 +172,7 @@ class MainActivity : AppCompatActivity() {
 //        syncOfflineData()
 
         initViews()
+        populateCounterGroupList()
         loadData()
         initListeners()
     }
@@ -304,6 +315,7 @@ class MainActivity : AppCompatActivity() {
 
         val database = Firebase.database(ConstantValues.DB_URL)
         val counterRef = database.getReference("counters")
+        val studentFairRef = database.getReference("student_fair")
         counterRef.keepSynced(true)
 
         val counterListener = object : ValueEventListener {
@@ -360,7 +372,193 @@ class MainActivity : AppCompatActivity() {
         }
         counterRef.addValueEventListener(counterListener)
 
+        val studentFairListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+//                val studentFairStatus = dataSnapshot.getValue<List<Counters>>()
+                val studentFairMap: Map<kotlin.String, *> = dataSnapshot.getValue() as Map<kotlin.String, *>
+                Log.d("TAG", " value is: "+ studentFairMap.get("fair_active_status"))
+
+                if(studentFairMap.get("fair_active_status")!!.equals("active")){
+                    ll_student_fare!!.visibility = View.VISIBLE
+                }else{
+                    ll_student_fare!!.visibility = View.GONE
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+        studentFairRef.addValueEventListener(studentFairListener)
+
 //        updateTodaysData()
+    }
+
+    private fun populateCounterGroupList() {
+        val database = Firebase.database(ConstantValues.DB_URL)
+        val counterGroupRef = database.getReference("counter_groups")
+
+        val counterGroupListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                val counters = dataSnapshot.getValue<List<CounterGroups>>()
+                Log.d("TAG", counters?.get(0)?.name + "")
+
+                counterGroupList!!.clear()
+                counters?.forEach {
+                    if(it != null){
+                        if(!it.name!!.equals("")){
+                            counterGroupObjList?.add(it)
+                            counterGroupList?.add("" + it.name)
+                        }
+                    }
+                }
+
+                if(counterGroupList?.size!! > 0){
+
+                    var layoutManager = GridLayoutManager(applicationContext, 2)
+                    rcvCounterGroup?.layoutManager = layoutManager
+                    counterGroupAdapter = CounterGroupAdapter(applicationContext)
+                    rcvCounterGroup?.adapter = counterGroupAdapter
+
+                    counterGroupAdapter?.setDataList(counterGroupObjList!!)
+                    var onItemClickListener: OnItemClickListener = object : OnItemClickListener{
+                        override fun itemClick(position: Int) {
+                            toCounterID = "" + counterGroupObjList!!.get(position).id
+                            getSelectedCounterTicketPrice(counter_group_id!!.toInt(), counterGroupObjList!!.get(position).id)
+                            printTicketAndSave()
+                        }
+                    }
+                    counterGroupAdapter?.setOnItemClickListener(onItemClickListener)
+
+                    /*if (spinner_from != null) {
+                        val adapter = ArrayAdapter(
+                            applicationContext,
+                            R.layout.counter_items, counterGroupList!!.toArray()
+                        )
+                        spinner_from?.adapter = adapter
+
+                        spinner_from?.onItemSelectedListener = object :
+                            AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(
+                                parent: AdapterView<*>,
+                                view: View, position: Int, id: Long
+                            ) {
+                                selectedPosForCounterGroup = position;
+                                fromCounterId = ""+counterGroupObjList!!.get(position).id
+                                *//*Toast.makeText(this@MainActivity,
+                                    counterGroupList!![position] + " selected.", Toast.LENGTH_SHORT).show()*//*
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>) {
+                                // write code to perform some action
+                            }
+                        }
+                    }
+
+                    if (spinner_to != null) {
+                        val adapter = ArrayAdapter(
+                            applicationContext,
+                            R.layout.counter_items, counterGroupList!!.toArray()
+                        )
+                        spinner_to?.adapter = adapter
+
+                        spinner_to?.onItemSelectedListener = object :
+                            AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(
+                                parent: AdapterView<*>,
+                                view: View, position: Int, id: Long
+                            ) {
+                                selectedPosForCounterGroup = position;
+                                toCounterId = ""+counterGroupObjList!!.get(position).id
+
+                                if(fromCounterId != null && !fromCounterId.equals("") &&
+                                    toCounterId != null && !toCounterId.equals("")){
+                                    getCounterWiseTicketPrice()
+                                }
+                                *//*Toast.makeText(this@MainActivity,
+                                    counterGroupList!![position] + " selected.", Toast.LENGTH_SHORT).show()*//*
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>) {
+                                // write code to perform some action
+                            }
+                        }
+                    }*/
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+        counterGroupRef.addValueEventListener(counterGroupListener)
+    }
+
+    private fun printTicketAndSave(){
+        var date = Date(System.currentTimeMillis())
+        val timeZoneDate = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+        var mobileDateTime = engNumToBangNum(timeZoneDate.format(date))
+
+        val contactMobiles = engNumToBangNum("01915150908\n01913260001,01831301012");
+        val totalTicketAmountBn = engNumToBangNum("" + totalTicketAmount)
+
+        if(!fromCounterID.equals("") && !toCounterID.equals("")){
+
+            printMe?.sendTextToPrinter("উৎসব ট্রান্সপোর্ট লিঃ\n", 28f, true, true, 1)
+            serialNo = sharedPref!!.getInt("SerialNo", 0)
+            serialNo = serialNo!! + 1
+
+
+            val user_id = sharedPref?.getString("user_id", "")
+
+            val edit = sharedPref?.edit()
+            edit?.putInt("SerialNo", serialNo!!)
+            edit?.apply()
+
+            var serialNoBN = engNumToBangNum("" + serialNo)
+            var ticketCountBN = engNumToBangNum("" + ticketCount)
+            var spannable : SpannableString
+            if(counter_group_id!!.equals("7")){
+                spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\nভাড়াঃ ${totalTicketAmountBn} টাকা\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
+                spannable.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0, // start
+                    21, // end
+                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+                )
+            }else{
+                spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\n(ভাড়া ৪০ টাকা + টোল ৫ টাকা প্রতি টিকেট) = ${totalTicketAmountBn} টাকা\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
+                spannable.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0, // start
+                    21, // end
+                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+                )
+            }
+
+
+            printMe?.sendTextToPrinter(spannable.toString(), 26f, false, false, 2)
+            tv_ticket_count?.setText(engNumToBangNum("" + ticketCount))
+
+            ticketSoldId = ticketSoldId!! + 1;
+            addTicketSold(
+                ticketSoldId!!,
+                counter_group_id!!.toInt(),
+                "" + fromCounterID,
+                "" + toCounterID,
+                totalTicketAmount.toString(),
+                ticketCount!!.toInt(),
+                System.currentTimeMillis()
+            )
+
+            ticketCount = 1
+            calculatePrice()
+        }
     }
 
     private fun getSelectedCounterTicketPrice(fromCounterGroupId: Int?, toCounterGroupId: Int?) {
@@ -444,6 +642,9 @@ class MainActivity : AppCompatActivity() {
         tv_total_vara = findViewById(R.id.tv_total_vara)
 
         spinner_to = findViewById(R.id.spinner_to)
+        rcvCounterGroup = findViewById(R.id.rcv_counter_groups)
+        chbx_student_fare = findViewById(R.id.chbx_student_fare)
+        ll_student_fare = findViewById(R.id.ll_student_fare)
     }
 
     fun addTicketSold(

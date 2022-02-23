@@ -56,18 +56,30 @@
     <RelativeLayout
         android:id="@+id/rlv_counter_section"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
+        android:visibility="visible"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcv_counter_groups"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            sweet:listitem="@layout/item_counter_group" />
+
         <RelativeLayout
             android:id="@+id/rl_from"
             android:layout_width="match_parent"
+            android:visibility="gone"
             android:layout_height="50dp">
 
             <TextView
@@ -116,6 +128,7 @@
             android:id="@+id/rl_to"
             android:layout_width="match_parent"
             android:layout_height="70dp"
+            android:visibility="gone"
             android:layout_below="@id/rl_from">
 
             <TextView
@@ -162,7 +175,7 @@
     <LinearLayout
         android:id="@+id/ll_ticket_count"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="70dp"
         app:layout_constraintTop_toBottomOf="@+id/rlv_counter_section"
         android:gravity="center"
         android:orientation="horizontal">
@@ -261,11 +274,30 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_student_fare"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="-20dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/ll_ticket_price"
+        android:gravity="center"
+        android:visibility="gone"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/chbx_student_fare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Student Fare" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/ll_ticket_sell_report"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="-20dp"
-        app:layout_constraintTop_toBottomOf="@+id/ll_ticket_price"
+        android:layout_height="70dp"
+        android:layout_marginTop="-10dp"
+        app:layout_constraintTop_toBottomOf="@+id/ll_student_fare"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -327,6 +359,7 @@
         android:background="@color/colorPrimary"
         android:descendantFocusability="blocksDescendants"
         android:gravity="center"
+        android:visibility="gone"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
