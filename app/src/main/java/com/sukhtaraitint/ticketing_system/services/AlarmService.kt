@@ -30,7 +30,7 @@ class AlarmService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Variables.PRAYER_ALARM_ONGOING = true
         try {
-            val notificationIntent = Intent(this, ReportActivity::class.java)
+            val notificationIntent = Intent(this, SuperAdminReportActivity::class.java)
             val alarmID = intent.getIntExtra("requestCode", 0)
             val PrayerName = intent.getStringExtra("PrayerName")
             val AlarmType = intent.getStringExtra("AlarmType")

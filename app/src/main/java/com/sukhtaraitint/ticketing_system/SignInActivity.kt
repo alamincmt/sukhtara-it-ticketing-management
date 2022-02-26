@@ -54,7 +54,11 @@ class SignInActivity : AppCompatActivity() {
         val user_type = sharedPref?.getString("user_type", "")
         if(user_name != null && !user_name.equals("")){
             if(user_type != null && (user_type.equals("admin") || user_type.equals("supadmin"))){
-                startActivity(Intent(applicationContext, ReportActivity::class.java))
+                if(user_type!!.equals("supadmin")){
+                    startActivity(Intent(applicationContext, SuperAdminReportActivity::class.java))
+                }else{
+                    startActivity(Intent(applicationContext, AdminReportActivity::class.java))
+                }
             }else{
                 startActivity(Intent(applicationContext, MainActivity::class.java))
             }
@@ -128,7 +132,11 @@ class SignInActivity : AppCompatActivity() {
                                     edit?.putString("location", adminObj?.location);
                                     edit?.apply()
 
-                                    startActivity(Intent(applicationContext, ReportActivity::class.java))
+                                    if(userName!!.equals("supadmin")){
+                                        startActivity(Intent(applicationContext, SuperAdminReportActivity::class.java))
+                                    }else{
+                                        startActivity(Intent(applicationContext, AdminReportActivity::class.java))
+                                    }
                                     finish()
                                 }else{
                                     Toast.makeText(applicationContext, "সঠিক তথ্য দিয়ে পুনরায় চেষ্টা করুন", Toast.LENGTH_LONG).show();

@@ -442,7 +442,12 @@ class MainActivity : AppCompatActivity() {
                             toCounterID = "" + counterGroupObjList!!.get(position).id
                             toCounter = counterGroupObjList!!.get(position).name
                             getSelectedCounterTicketPrice(counter_group_id!!.toInt(), counterGroupObjList!!.get(position).id)
-                            printTicketAndSave()
+
+                            if(counter_group_id!!.toInt() != counterGroupObjList!!.get(position).id){
+                                printTicketAndSave()
+                            }else{
+                                Toast.makeText(applicationContext!!, "গন্তব্য স্থান সঠিক নয় ।", Toast.LENGTH_LONG).show()
+                            }
                         }
                     }
                     counterGroupAdapter?.setOnItemClickListener(onItemClickListener)

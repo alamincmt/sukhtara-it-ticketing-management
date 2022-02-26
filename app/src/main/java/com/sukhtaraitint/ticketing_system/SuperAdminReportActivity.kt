@@ -92,10 +92,10 @@ var counterWiseSellReport: HashMap<String, Int>? = null
 
 var isDataCalled : Boolean = false
 
-class ReportActivity : AppCompatActivity() {
+class SuperAdminReportActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_report)
+        setContentView(R.layout.activity_super_admin_report)
         counterObjList!!.clear()
         counterWiseSellReport = hashMapOf<String, Int>()
 
