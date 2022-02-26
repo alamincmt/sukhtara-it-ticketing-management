@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
     var toCounterID: String? = ""
     var fromCounterID: String? = ""
 
-    var isNeedToSaveData : Boolean? = false;
+    var isStudentFareEnabled : Boolean? = false
 
     var tv_username : TextView? = null
     var tv_phonenumber : TextView? = null
@@ -210,6 +210,19 @@ class MainActivity : AppCompatActivity() {
                 calculatePrice()
             }
         }
+
+        chbx_student_fare!!.setOnCheckedChangeListener(object : RadioGroup.OnCheckedChangeListener,
+            CompoundButton.OnCheckedChangeListener {
+            override fun onCheckedChanged(p0: RadioGroup?, p1: Int) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onCheckedChanged(p0: CompoundButton?, p1: Boolean) {
+                isStudentFareEnabled = p1
+                calculatePrice()
+            }
+
+        })
 
         btn_daily_report?.setOnClickListener {
             startActivity(Intent(applicationContext, DailyReportActivity::class.java))
@@ -427,6 +440,7 @@ class MainActivity : AppCompatActivity() {
                     var onItemClickListener: OnItemClickListener = object : OnItemClickListener{
                         override fun itemClick(position: Int) {
                             toCounterID = "" + counterGroupObjList!!.get(position).id
+                            toCounter = counterGroupObjList!!.get(position).name
                             getSelectedCounterTicketPrice(counter_group_id!!.toInt(), counterGroupObjList!!.get(position).id)
                             printTicketAndSave()
                         }
@@ -504,7 +518,8 @@ class MainActivity : AppCompatActivity() {
         val timeZoneDate = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
         var mobileDateTime = engNumToBangNum(timeZoneDate.format(date))
 
-        val contactMobiles = engNumToBangNum("01915150908\n01913260001,01831301012");
+        val contactMobiles = engNumToBangNum("01915150908\n01913260001,01831301012")
+
         val totalTicketAmountBn = engNumToBangNum("" + totalTicketAmount)
 
         if(!fromCounterID.equals("") && !toCounterID.equals("")){
@@ -556,6 +571,8 @@ class MainActivity : AppCompatActivity() {
                 System.currentTimeMillis()
             )
 
+            isStudentFareEnabled = false
+            chbx_student_fare!!.isChecked = false
             ticketCount = 1
             calculatePrice()
         }
@@ -618,7 +635,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun calculatePrice(){
-        totalTicketAmount = ticketCount!! * perTicketPrice!!
+        if(isStudentFareEnabled!!){
+            totalTicketAmount = (ticketCount!! * perTicketPrice!!)/2
+        }else{
+            totalTicketAmount = ticketCount!! * perTicketPrice!!
+        }
         tv_ticket_count?.setText(engNumToBangNum("" + ticketCount))
         tv_total_vara?.setText(engNumToBangNum("" + totalTicketAmount) + " টাকা")
 //        tv_total_amount?.setText("সর্বমোট দামঃ " + totalTicketAmount + " টাকা")
