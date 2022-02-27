@@ -514,6 +514,12 @@ class AdminReportActivity : AppCompatActivity() {
                                         ticketSoldList_!!.add(totalTicketSold!!)
                                         counterSellCount = counterSellCount + ticketSoldSingleMap.get("total_tickets").toString().toInt()
 
+
+                                        var date = Date(System.currentTimeMillis())
+                                        val timeZoneDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                                        var mobileDateTime = engNumToBangNum(timeZoneDate.format(date))
+                                        tvReportDate!!.setText("দৈনিক - ${mobileDateTime}")
+
                                         if(counterGroupWiseTicketCount.containsKey(ticketSoldSingleMap.get("group_counter_id").toString())){
                                             counterGroupWiseTicketCount.put(ticketSoldSingleMap.get("group_counter_id").toString(), counterGroupWiseTicketCount.get(ticketSoldSingleMap.get("group_counter_id").toString())!! + (ticketSoldSingleMap.get("total_tickets").toString().toInt()))
                                             counterGroupWiseTicketPrice.put(ticketSoldSingleMap.get("group_counter_id").toString(), counterGroupWiseTicketPrice.get(ticketSoldSingleMap.get("group_counter_id").toString())!! + (ticketSoldSingleMap.get("price_total").toString().toDouble()))
@@ -522,7 +528,18 @@ class AdminReportActivity : AppCompatActivity() {
                                             counterGroupWiseTicketPrice.put(ticketSoldSingleMap.get("group_counter_id").toString(), ticketSoldSingleMap.get("price_total").toString().toDouble())
                                         }
 
-                                        if(reportTypeWithCounterType__!!.equals("single_counter_wise")){
+                                        // get total ticket sold + total ammount
+                                        totalTicketAmount__ = totalTicketAmount__!! + ticketSoldSingleMap.get("price_total").toString().toDouble()
+                                        ticketCount__ = ticketCount__!! + ticketSoldSingleMap.get("total_tickets").toString().toInt()
+
+                                        tvTotalAmmount?.setText("সর্বমোট দামঃ " + engNumToBangNum("" + totalTicketAmount__) + " টাকা")
+                                        tvTotalTicket?.setText(
+                                            "সর্বমোট টিকেট সংখ্যাঃ " + engNumToBangNum(
+                                                "" + ticketCount__
+                                            )
+                                        )
+
+                                        /*if(reportTypeWithCounterType__!!.equals("single_counter_wise")){
                                             if(totalTicketSold != null){
                                                 val cal = Calendar.getInstance()
                                                 cal.timeInMillis = totalTicketSold.date_time!!
@@ -831,7 +848,7 @@ class AdminReportActivity : AppCompatActivity() {
                                                     }
                                                 }
                                             }
-                                        }
+                                        }*/
                                     }
 
                                     updateCounterGroupsData()

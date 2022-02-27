@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity() {
     var fromCounterID: String? = ""
 
     var isStudentFareEnabled : Boolean? = false
+    var fair_percentage: Int? = 50
 
     var tv_username : TextView? = null
     var tv_phonenumber : TextView? = null
@@ -393,8 +394,10 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TAG", " value is: "+ studentFairMap.get("fair_active_status"))
 
                 if(studentFairMap.get("fair_active_status")!!.equals("active")){
+                    fair_percentage = studentFairMap.get("fair_percentage").toString().toInt()
                     ll_student_fare!!.visibility = View.VISIBLE
                 }else{
+                    fair_percentage = studentFairMap.get("fair_percentage").toString().toInt()
                     ll_student_fare!!.visibility = View.GONE
                 }
             }
@@ -641,7 +644,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun calculatePrice(){
         if(isStudentFareEnabled!!){
-            totalTicketAmount = (ticketCount!! * perTicketPrice!!)/2
+            totalTicketAmount = (ticketCount!! * perTicketPrice!!)
+            var totalTicketAmountFair = (((ticketCount!!.toDouble() * perTicketPrice!!.toDouble())/100) * fair_percentage!!.toDouble()).toInt()
+            totalTicketAmount = totalTicketAmount!! - totalTicketAmountFair
         }else{
             totalTicketAmount = ticketCount!! * perTicketPrice!!
         }
