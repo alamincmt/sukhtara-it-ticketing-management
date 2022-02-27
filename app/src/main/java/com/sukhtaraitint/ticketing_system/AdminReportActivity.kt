@@ -137,6 +137,7 @@ class AdminReportActivity : AppCompatActivity() {
         counterGroupReportAdapter?.setDataList(counterGroupObjList__!!)
         var onItemClickListener: OnItemClickListener = object : OnItemClickListener {
             override fun itemClick(position: Int) {
+                startActivity(Intent(applicationContext, AdminReportCounterWiseActivity::class.java).putExtra("counter_group_id", counterGroupObjList__!!.get(position).id))
 //                toCounterID = "" + counterGroupObjList!!.get(position).id
 //                toCounter = counterGroupObjList!!.get(position).name
 //                getSelectedCounterTicketPrice(counter_group_id!!.toInt(), counterGroupObjList!!.get(position).id)
