@@ -5,16 +5,15 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.provider.Settings.Secure
 import android.util.Log
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
-import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -25,6 +24,7 @@ import com.sukhtaraitint.ticketing_system.models.Admins
 import com.sukhtaraitint.ticketing_system.models.Counters
 import com.sukhtaraitint.ticketing_system.utils.ConstantValues
 import org.json.JSONArray
+
 
 var btn_signin : Button? = null;
 var btn_signin_offline : Button? = null;
@@ -158,10 +158,9 @@ class SignInActivity : AppCompatActivity() {
                                 // Get Post object and use the values to update the UI
                                 val counters = dataSnapshot.getValue<List<Counters>>()
                                 Log.d("TAG", counters?.get(0)?.name + "")
-
+                                val androidId = Secure.getString(contentResolver, Secure.ANDROID_ID)
                                 counters?.forEach {
                                     if(it != null){
-                                        var androidId = Settings.Secure.ANDROID_ID
                                         if(it.user_name!!.equals(userName) && it.password!!.equals(password) && (it.device_uuid == null || it.device_uuid!!.equals("") || it.device_uuid!!.equals(androidId))){
                                             counterObj = it
                                         }
@@ -172,7 +171,7 @@ class SignInActivity : AppCompatActivity() {
 
                                     if(counterObj!!.device_uuid!!.equals("")){
                                         val counterChildRef = counterRef.child(""+counterObj!!.id)
-                                        counterObj!!.device_uuid = Settings.Secure.ANDROID_ID
+                                        counterObj!!.device_uuid = androidId
                                         counterChildRef.setValue(counterObj)
                                     }
 

@@ -259,9 +259,9 @@ class AdminReportActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_report, menu)
+        menuInflater.inflate(R.menu.menu_report_admin, menu)
 
-        var menuItem: MenuItem = menu.findItem(R.id.delete_total_report)
+        /*var menuItem: MenuItem = menu.findItem(R.id.delete_total_report)
         var billMenuItem: MenuItem = menu.findItem(R.id.bill_generate)
         var priceMenuItem: MenuItem = menu.findItem(R.id.ticket_price)
         if(menuItem != null){
@@ -274,9 +274,9 @@ class AdminReportActivity : AppCompatActivity() {
 
         if(priceMenuItem != null){
             priceMenuItem.setVisible(false)
-        }
+        }*/
 
-        if(user_type__!!.equals("supadmin")){
+        /*if(user_type__!!.equals("supadmin")){
             if(menuItem != null){
                 menuItem.setVisible(true)
             }
@@ -288,14 +288,14 @@ class AdminReportActivity : AppCompatActivity() {
             if(priceMenuItem != null){
                 priceMenuItem.setVisible(true)
             }
-        }
+        }*/
 
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.sync_data -> {
+            /*R.id.sync_data -> {
                 // todo: implement sync functionality here.
                 if(user_type__!!.equals("supadmin")){
                     saveTotalSoldTicketReport()
@@ -336,7 +336,7 @@ class AdminReportActivity : AppCompatActivity() {
             R.id.ticket_price -> {
                 startActivity(Intent(applicationContext, SetPriceActivity::class.java))
                 return true
-            }
+            }*/
             R.id.logout -> {
                 val edit = sharedPref?.edit()
                 edit?.putString("user_type", "")
