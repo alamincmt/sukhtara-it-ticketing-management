@@ -227,6 +227,7 @@ class AdminReportActivity : AppCompatActivity() {
                 Log.d("TAG", counters?.get(0)?.name + "")
 
                 counterGroupList__!!.clear()
+                counterGroupObjList__!!.clear()
                 counters?.forEach {
                     if(it != null){
                         if(!it.name!!.equals("")){

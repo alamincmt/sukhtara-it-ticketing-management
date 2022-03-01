@@ -423,6 +423,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TAG", counters?.get(0)?.name + "")
 
                 counterGroupList!!.clear()
+                counterGroupObjList!!.clear()
                 counters?.forEach {
                     if(it != null){
                         if(!it.name!!.equals("")){
@@ -454,61 +455,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     counterGroupAdapter?.setOnItemClickListener(onItemClickListener)
-
-                    /*if (spinner_from != null) {
-                        val adapter = ArrayAdapter(
-                            applicationContext,
-                            R.layout.counter_items, counterGroupList!!.toArray()
-                        )
-                        spinner_from?.adapter = adapter
-
-                        spinner_from?.onItemSelectedListener = object :
-                            AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(
-                                parent: AdapterView<*>,
-                                view: View, position: Int, id: Long
-                            ) {
-                                selectedPosForCounterGroup = position;
-                                fromCounterId = ""+counterGroupObjList!!.get(position).id
-                                *//*Toast.makeText(this@MainActivity,
-                                    counterGroupList!![position] + " selected.", Toast.LENGTH_SHORT).show()*//*
-                            }
-
-                            override fun onNothingSelected(parent: AdapterView<*>) {
-                                // write code to perform some action
-                            }
-                        }
-                    }
-
-                    if (spinner_to != null) {
-                        val adapter = ArrayAdapter(
-                            applicationContext,
-                            R.layout.counter_items, counterGroupList!!.toArray()
-                        )
-                        spinner_to?.adapter = adapter
-
-                        spinner_to?.onItemSelectedListener = object :
-                            AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(
-                                parent: AdapterView<*>,
-                                view: View, position: Int, id: Long
-                            ) {
-                                selectedPosForCounterGroup = position;
-                                toCounterId = ""+counterGroupObjList!!.get(position).id
-
-                                if(fromCounterId != null && !fromCounterId.equals("") &&
-                                    toCounterId != null && !toCounterId.equals("")){
-                                    getCounterWiseTicketPrice()
-                                }
-                                *//*Toast.makeText(this@MainActivity,
-                                    counterGroupList!![position] + " selected.", Toast.LENGTH_SHORT).show()*//*
-                            }
-
-                            override fun onNothingSelected(parent: AdapterView<*>) {
-                                // write code to perform some action
-                            }
-                        }
-                    }*/
                 }
 
             }
