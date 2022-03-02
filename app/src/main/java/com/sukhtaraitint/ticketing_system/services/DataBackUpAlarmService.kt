@@ -7,21 +7,32 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.sukhtaraitint.ticketing_system.*
+import com.sukhtaraitint.ticketing_system.models.TicketSold
 import com.sukhtaraitint.ticketing_system.models.TotalTicketSoldReport
-import com.sukhtaraitint.ticketing_system.receivers.AlarmBroadcastReceiver
+import com.sukhtaraitint.ticketing_system.receivers.DataBackUpAlarmBroadcastReceiver
 import com.sukhtaraitint.ticketing_system.utils.ConstantValues
 import com.sukhtaraitint.ticketing_system.utils.Variables
 import java.lang.Exception
+import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.Executors
 
 
-class AlarmService : Service() {
+class DataBackUpAlarmService : Service() {
     private var mediaPlayer: MediaPlayer? = null
+    var ticketCount: Int? = 0
+    var counterWiseSellReport: HashMap<String, Int>? = null
+    var user_type: String? = "superadmin"
+    var ticketSoldListener : ValueEventListener? = null
     override fun onCreate() {
         Variables.PRAYER_ALARM_ONGOING = true
         super.onCreate()
@@ -148,7 +159,7 @@ class AlarmService : Service() {
         val alarmManager = applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
         //                    Log.d("Alarm_Type007", " : "+ getAlarmType(prayerTimeObj)+ " ::: "+ alarmType);
 //                    alarmType = getAlarmType(prayerTimeObj);
-        val intent = Intent(applicationContext, AlarmBroadcastReceiver::class.java)
+        val intent = Intent(applicationContext, DataBackUpAlarmBroadcastReceiver::class.java)
         intent.putExtra("TITLE", "Data Back up And Delete ...")
         intent.putExtra("requestCode", 100)
         val alarmPendingIntent = PendingIntent.getBroadcast(
@@ -190,27 +201,67 @@ class AlarmService : Service() {
 
     // Data back up and delete related code
     private fun saveTotalSoldTicketReport() {
-        if(ticketCount!! > 0){
-            val totalTicketSoldReportObj = TotalTicketSoldReport(
-                counterWiseSellReport, ticketCount,
-                System.currentTimeMillis(),
-                user_type
-            )
+        val database = Firebase.database(ConstantValues.DB_URL)
+        val ticketSoldRef = database.getReference("ticket_sold")
 
-            // Write a message to the database
-            val database = Firebase.database(ConstantValues.DB_URL)
-            val ticketSoldReportReference = database.getReference("daily_sell_report")
-            ticketSoldReportReference.keepSynced(true)
+        ticketCount = 0
 
-            ticketSoldReportReference.child(createTicketSoldReportID()!!).setValue(totalTicketSoldReportObj)
-                .addOnSuccessListener {
-                    Toast.makeText(applicationContext, "Data Successfully Synced. ", Toast.LENGTH_LONG).show()
-                    deleteTicketSoldReport()
+        ticketSoldListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.d("DataSnapshot", snapshot.getValue().toString())
+                var totalTicketSold : TicketSold? = null
+
+                if (snapshot.getValue() != null){
+                    val ticketSoldCounterSet = snapshot.getValue() as Map<String, *>
+                    for ((key, value) in ticketSoldCounterSet) {
+                        val ticketSoldMap: Map<String, *> = value as Map<String, *>
+                        var counterSellCount = 0
+                        for ((key1, value1) in ticketSoldMap) {
+                            val ticketSoldSingleMap: Map<String, *> = value1 as Map<String, *>
+
+                            totalTicketSold = TicketSold(ticketSoldSingleMap.get("id").toString().toInt(),
+                                ticketSoldSingleMap.get("group_counter_id").toString().toInt(), ticketSoldSingleMap.get("from_counter_id").toString(),
+                                ticketSoldSingleMap.get("to_counter_id").toString(), ticketSoldSingleMap.get("price_total").toString(),
+                                ticketSoldSingleMap.get("total_tickets").toString().toInt(), ticketSoldSingleMap.get("date_time").toString().toLong(),
+                                ticketSoldSingleMap.get("sold_by_counter_id").toString())
+                            ticketCount = ticketCount!! + ticketSoldSingleMap.get("total_tickets").toString().toInt()
+                        }
+
+                    }
+
+                    if(ticketCount!! > 0){
+                        val totalTicketSoldReportObj = TotalTicketSoldReport(
+                            counterWiseSellReport, ticketCount,
+                            System.currentTimeMillis(),
+                            user_type
+                        )
+
+                        // Write a message to the database
+                        val database = Firebase.database(ConstantValues.DB_URL)
+                        val ticketSoldReportReference = database.getReference("daily_sell_report")
+                        ticketSoldReportReference.keepSynced(true)
+
+                        ticketSoldReportReference.child(createTicketSoldReportID()!!).setValue(totalTicketSoldReportObj)
+                            .addOnSuccessListener {
+                                Toast.makeText(applicationContext, "Data Successfully Synced. ", Toast.LENGTH_LONG).show()
+                                deleteTicketSoldReport()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(applicationContext, "Data Sync Failed\nPlease try again. ", Toast.LENGTH_LONG).show()
+                            }
+                    }
                 }
-                .addOnFailureListener {
-                    Toast.makeText(applicationContext, "Data Sync Failed\nPlease try again. ", Toast.LENGTH_LONG).show()
-                }
+
+                ticketSoldRef.removeEventListener(ticketSoldListener!!)
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
         }
+        ticketSoldRef.addValueEventListener(ticketSoldListener!!)
     }
 
     private fun deleteTicketSoldReport() {

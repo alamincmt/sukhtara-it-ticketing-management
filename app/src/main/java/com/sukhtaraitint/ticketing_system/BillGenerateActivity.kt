@@ -157,7 +157,7 @@ class BillGenerateActivity : PDFCreatorActivity() {
         val lineSeparatorView3 =
             PDFLineSeparatorView(applicationContext).setBackgroundColor(Color.WHITE)
         pdfBody.addView(lineSeparatorView3)
-        val widthPercent = intArrayOf(22, 23, 15, 20, 20) // Sum should be equal to 100%
+        val widthPercent = intArrayOf(21, 43, 12, 12, 12) // Sum should be equal to 100%
         val textInTable = arrayOf("তারিখঃ", "বিবরণঃ", "টিকেট বিক্রয়ঃ", "প্রতি টিকেট বিলঃ","মোট বিলঃ")
 
         /*val pdfTableTitleView = PDFTextView(applicationContext, PDFTextView.PDF_TEXT_SIZE.P)
@@ -194,14 +194,14 @@ class BillGenerateActivity : PDFCreatorActivity() {
                 val df = DecimalFormat("#")
                 if(ConstantValues.ticketSoldReportList!![i] != null && ConstantValues.ticketSoldReportList!![i].date_time != null){
                     if(s == 0){
-                        pdfTextView.setText("" + getBanglaDateFromMillis((ConstantValues.ticketSoldReportList!![i].date_time)) + "\n")
+                        pdfTextView.setText("" + getBanglaDateFromMillis((ConstantValues.ticketSoldReportList!![i].date_time)) + "")
                     }else if(s == 1){
-                        pdfTextView.setText("দৈনিক টিকেট বিক্রয়"  + "\n")
-                    }else if (s == 2){
-                        pdfTextView.setText("" + engNumToBangNum( "" + (ConstantValues.ticketSoldReportList!![i].total_tickets))  + "\n")
-                    }else if (s == 3){
-                        pdfTextView.setText(engNumToBangNum("" + perTicketPrice)  + "\n")
-                    }else if (s == 4){
+                        pdfTextView.setText("দৈনিক টিকেট বিক্রয়"  + "")
+                    }else if (s == 5){
+                        pdfTextView.setText("" + engNumToBangNum( "" + (ConstantValues.ticketSoldReportList!![i].total_tickets))  + "")
+                    }else if (s == 6){
+                        pdfTextView.setText(engNumToBangNum("" + perTicketPrice)  + "")
+                    }else if (s == 8){
                         var priceTotal = (perTicketPrice!!.toDouble() * ConstantValues.ticketSoldReportList!![i].total_tickets!!.toDouble())
                         pdfTextView.setText("" + engNumToBangNum("${df.format(priceTotal)}") + "\n")
                         totalTicketAmount = totalTicketAmount!! + (perTicketPrice!!.toDouble() * ConstantValues.ticketSoldReportList!![i].total_tickets!!.toDouble())
@@ -318,7 +318,7 @@ class BillGenerateActivity : PDFCreatorActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(com.sukhtaraitint.ticketing_system.R.menu.menu_bill_generate, menu)
+        menuInflater.inflate(R.menu.menu_bill_generate, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -355,7 +355,7 @@ class BillGenerateActivity : PDFCreatorActivity() {
     fun showTicketPriceRateDialog(){
         val alert =  AlertDialog.Builder(this)
         val edittext = EditText(this)
-        edittext.hint = "Enter Name"
+        edittext.hint = "Enter Price"
         edittext.maxLines = 1
 
         val layout = FrameLayout(this)

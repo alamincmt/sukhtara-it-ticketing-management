@@ -27,7 +27,7 @@ import com.sukhtaraitint.ticketing_system.models.CounterGroups
 import com.sukhtaraitint.ticketing_system.models.Counters
 import com.sukhtaraitint.ticketing_system.models.TicketSold
 import com.sukhtaraitint.ticketing_system.models.TotalTicketSoldReport
-import com.sukhtaraitint.ticketing_system.receivers.AlarmBroadcastReceiver
+import com.sukhtaraitint.ticketing_system.receivers.DataBackUpAlarmBroadcastReceiver
 import com.sukhtaraitint.ticketing_system.utils.ConstantValues
 import com.sukhtaraitint.ticketing_system.utils.ProgressDialog
 import java.text.SimpleDateFormat
@@ -422,8 +422,7 @@ class SuperAdminReportActivity : AppCompatActivity() {
                 // get all the data from db
                 // make pdf
                 // send to transport owner
-
-                startActivity(Intent(applicationContext, BillGenerateActivity::class.java))
+                showTicketPriceRateDialog()
                 return true
             }
             R.id.ticket_price -> {
@@ -445,6 +444,45 @@ class SuperAdminReportActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    fun showTicketPriceRateDialog(){
+        val alert =  AlertDialog.Builder(this)
+        val edittext = EditText(this)
+        edittext.hint = "Enter Price"
+        edittext.maxLines = 1
+
+        val layout = FrameLayout(this)
+//set padding in parent layout
+        layout.setPaddingRelative(45,15,45,0)
+        alert.setTitle(title)
+        layout.addView(edittext)
+        alert.setView(layout)
+
+        alert.setPositiveButton("Generate Bill", DialogInterface.OnClickListener {
+                dialog, which ->
+            run {
+
+                val perTicketPriceTxt = edittext.text.toString()
+                if(perTicketPriceTxt != null && !perTicketPriceTxt.equals("")){
+                    perTicketPrice = perTicketPriceTxt.trim().toDouble()
+                    ConstantValues.perTicketPrice = perTicketPrice!!
+                    startActivity(Intent(applicationContext, BillGenerateActivity::class.java))
+                }else{
+                    Toast.makeText(applicationContext, "Please enter correct value. ", Toast.LENGTH_LONG).show()
+                }
+
+            }
+
+        })
+        alert.setNegativeButton("No", DialogInterface.OnClickListener {
+                dialog, which ->
+            run {
+                alert.create().dismiss()
+            }
+        })
+
+        alert.show()
     }
 
     private fun showTicketSoldReportDeleteDialog(message: String) {
@@ -985,7 +1023,7 @@ class SuperAdminReportActivity : AppCompatActivity() {
 
     fun setAlarmForDataBackupAndDelete(){
         val alarmManager = applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(applicationContext, AlarmBroadcastReceiver::class.java)
+        val intent = Intent(applicationContext, DataBackUpAlarmBroadcastReceiver::class.java)
         intent.putExtra("TITLE", "Data Back up And Delete ...")
         intent.putExtra("requestCode", 100)
 
@@ -1002,7 +1040,7 @@ class SuperAdminReportActivity : AppCompatActivity() {
         // Create a calendar for midnight
         val todayMidnight = Calendar.getInstance()
         todayMidnight.add(Calendar.DATE, 1)
-        todayMidnight[Calendar.HOUR_OF_DAY] = 0
+        todayMidnight[Calendar.HOUR_OF_DAY] = 1
         todayMidnight[Calendar.MINUTE] = 0
         todayMidnight[Calendar.SECOND] = 0
 

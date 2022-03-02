@@ -5,8 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.sukhtaraitint.ticketing_system.receivers.AlarmBroadcastReceiver
-import java.util.*
+import com.sukhtaraitint.ticketing_system.receivers.DataBackUpAlarmBroadcastReceiver
 
 class TaskScheduler {
 
@@ -54,7 +53,7 @@ class TaskScheduler {
         var alarmType = "data synchronization"
         //                    Log.d("Alarm_Type007", " : "+ getAlarmType(prayerTimeObj)+ " ::: "+ alarmType);
 //                    alarmType = getAlarmType(prayerTimeObj);
-        val intent = Intent(context, AlarmBroadcastReceiver::class.java)
+        val intent = Intent(context, DataBackUpAlarmBroadcastReceiver::class.java)
         intent.putExtra("TITLE", "Prayer Title ...")
         intent.putExtra("requestCode", millis)
         intent.putExtra("PrayerName", prayerName)

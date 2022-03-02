@@ -18,7 +18,7 @@
         android:requestLegacyExternalStorage="true"
         android:theme="@style/AppTheme">
 
-        <receiver android:name=".receivers.AlarmBroadcastReceiver"
+        <receiver android:name=".receivers.DataBackUpAlarmBroadcastReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -26,8 +26,8 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
-        <service android:name=".services.AlarmService" />
-        <service android:name=".services.RescheduleAlarmsService" />
+        <service android:name=".services.DataBackUpAlarmService" />
+        <service android:name=".services.RescheduleDataBackUpAlarmsService" />
 
         <activity
             android:name=".SetPriceActivity"

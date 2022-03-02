@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/add_ticket_price_rate"
-        android:visible="false"
+        android:visible="true"
         android:title="Add Ticket Price Rate" />
     <item
         android:id="@+id/download_pdf_of_bill"

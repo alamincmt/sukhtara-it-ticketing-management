@@ -1,15 +1,8 @@
 package com.sukhtaraitint.ticketing_system
 
-import android.app.AlarmManager
-import android.app.DatePickerDialog
-import android.app.PendingIntent
-import android.app.TimePickerDialog
-import android.content.DialogInterface
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -25,11 +18,9 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
-import com.sukhtaraitint.ticketing_system.adapters.CounterGroupAdapter
 import com.sukhtaraitint.ticketing_system.adapters.CounterGroupReportAdapter
 import com.sukhtaraitint.ticketing_system.listeners.OnItemClickListener
 import com.sukhtaraitint.ticketing_system.models.*
-import com.sukhtaraitint.ticketing_system.receivers.AlarmBroadcastReceiver
 import com.sukhtaraitint.ticketing_system.utils.ConstantValues
 import com.sukhtaraitint.ticketing_system.utils.ProgressDialog
 import java.text.SimpleDateFormat

@@ -1,9 +1,7 @@
 package com.sukhtaraitint.ticketing_system.services;
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -12,19 +10,11 @@ import android.os.IBinder;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.LifecycleService;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ProcessLifecycleOwner;
 
 import com.sukhtaraitint.ticketing_system.R;
-import com.sukhtaraitint.ticketing_system.receivers.AlarmBroadcastReceiver;
 import com.sukhtaraitint.ticketing_system.utils.Variables;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
-public class  RescheduleAlarmsService extends LifecycleService {
+public class RescheduleDataBackUpAlarmsService extends LifecycleService {
 
     public static final String ALARM_CHANNEL_ID = "ALARM_SERVICE_CHANNEL_NEW";
 
