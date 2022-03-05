@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.provider.Settings.Secure
 import android.util.Log
@@ -24,6 +25,8 @@ import com.sukhtaraitint.ticketing_system.models.Admins
 import com.sukhtaraitint.ticketing_system.models.Counters
 import com.sukhtaraitint.ticketing_system.utils.ConstantValues
 import org.json.JSONArray
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 
 var btn_signin : Button? = null;
@@ -186,6 +189,8 @@ class SignInActivity : AppCompatActivity() {
                                     edit?.putLong("TimeMillisForSerialNo", System.currentTimeMillis())
                                     edit?.putInt("SerialNo", 0)
                                     edit?.apply()
+
+                                    counterObj = null
                                     startActivity(Intent(applicationContext, MainActivity::class.java))
                                     finish()
                                 }else{

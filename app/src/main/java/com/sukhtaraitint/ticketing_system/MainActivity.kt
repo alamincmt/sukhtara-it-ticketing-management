@@ -75,6 +75,9 @@ class MainActivity : AppCompatActivity() {
     var isStudentFareEnabled : Boolean? = false
     var fair_percentage: Int? = 50
 
+    var isTollAmountEnabled : Boolean? = false
+    var toll_amount: Int? = 0
+
     var tv_username : TextView? = null
     var tv_phonenumber : TextView? = null
 
@@ -330,6 +333,8 @@ class MainActivity : AppCompatActivity() {
         val database = Firebase.database(ConstantValues.DB_URL)
         val counterRef = database.getReference("counters")
         val studentFairRef = database.getReference("student_fair")
+        val tollPriceRef = database.getReference("toll_price")
+
         counterRef.keepSynced(true)
 
         val counterListener = object : ValueEventListener {
@@ -397,7 +402,7 @@ class MainActivity : AppCompatActivity() {
                     fair_percentage = studentFairMap.get("fair_percentage").toString().toInt()
                     ll_student_fare!!.visibility = View.VISIBLE
                 }else{
-                    fair_percentage = studentFairMap.get("fair_percentage").toString().toInt()
+                    fair_percentage = 0
                     ll_student_fare!!.visibility = View.GONE
                 }
             }
@@ -408,6 +413,27 @@ class MainActivity : AppCompatActivity() {
             }
         }
         studentFairRef.addValueEventListener(studentFairListener)
+
+        val tollPriceListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                val tollMap: Map<kotlin.String, *> = dataSnapshot.getValue() as Map<kotlin.String, *>
+                Log.d("TAG", " value is: "+ tollMap.get("active_status"))
+
+                if(tollMap.get("active_status")!!.equals("active")){
+                    toll_amount = tollMap.get("toll_price").toString().toInt()
+                }else{
+                    toll_amount = 0
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+
+        tollPriceRef.addValueEventListener(tollPriceListener)
 
 //        updateTodaysData()
     }
@@ -492,7 +518,27 @@ class MainActivity : AppCompatActivity() {
             var serialNoBN = engNumToBangNum("" + serialNo)
             var ticketCountBN = engNumToBangNum("" + ticketCount)
             var spannable : SpannableString
-            if(counter_group_id!!.equals("7")){
+
+            if(toll_amount!! == 0){
+                spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\n(ভাড়া "+ engNumToBangNum(""+perTicketPrice!!) +" টাকা প্রতি টিকেট) = ${totalTicketAmountBn} টাকা\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
+                spannable.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0, // start
+                    21, // end
+                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+                )
+            }else{
+                spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\n(ভাড়া "+ engNumToBangNum(""+perTicketPrice!!) +" টাকা + টোল "+ engNumToBangNum(""+toll_amount!!) + " টাকা প্রতি টিকেট) = ${totalTicketAmountBn} টাকা\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
+                spannable.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0, // start
+                    21, // end
+                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+                )
+            }
+
+            // todo: for utshob counter need to enable this block of code.
+            /*if(counter_group_id!!.equals("7")){
                 spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\nভাড়াঃ ${totalTicketAmountBn} টাকা\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
                 spannable.setSpan(
                     StyleSpan(Typeface.BOLD),
@@ -501,14 +547,24 @@ class MainActivity : AppCompatActivity() {
                     Spannable.SPAN_EXCLUSIVE_INCLUSIVE
                 )
             }else{
-                spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\n(ভাড়া ৪০ টাকা + টোল ৫ টাকা প্রতি টিকেট) = ${totalTicketAmountBn} টাকা\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
-                spannable.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    0, // start
-                    21, // end
-                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE
-                )
-            }
+                if(toll_amount!! == 0){
+                    spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\n(ভাড়া "+ engNumToBangNum(""+perTicketPrice!!) +" টাকা প্রতি টিকেট) = ${totalTicketAmountBn} টাকা\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
+                    spannable.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        0, // start
+                        21, // end
+                        Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+                    )
+                }else{
+                    spannable = SpannableString("সিরিয়াল নংঃ ${serialNoBN}\nতারিখঃ ${mobileDateTime}\n${fromCounter} টু ${toCounter}\nটিকেট সংখ্যাঃ ${ticketCountBN}টি\n(ভাড়া "+ engNumToBangNum(""+perTicketPrice!!) +" টাকা + টোল "+ engNumToBangNum(""+toll_amount!!) + " টাকা প্রতি টিকেট) = ${totalTicketAmountBn} টাকা\n\nঅভিযোগ/রিজার্ভঃ${contactMobiles}\n\nSoft By: sukhtaraintltd.com\n01714070437\n")
+                    spannable.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        0, // start
+                        21, // end
+                        Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+                    )
+                }
+            }*/
 
 
             printMe?.sendTextToPrinter(spannable.toString(), 26f, false, false, 2)

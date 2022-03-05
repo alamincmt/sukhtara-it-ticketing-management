@@ -627,7 +627,7 @@ class SuperAdminReportActivity : AppCompatActivity() {
                             ticketSoldList?.clear()
 
                             if (snapshot.getValue() != null){
-                                val ticketSoldCounterSet = snapshot.getValue() as Map<String, *>
+                                val ticketSoldCounterSet = snapshot.value as Map<String, *>
                                 for ((key, value) in ticketSoldCounterSet) {
                                     val ticketSoldMap: Map<String, *> = value as Map<String, *>
                                     var counterSellCount = 0
