@@ -4,26 +4,26 @@
         android:id="@+id/sync_data"
         android:title="Sync Data" />
     <item
-        android:id="@+id/daily_report"
-        android:title="দৈনিক" />
-    <item
         android:id="@+id/ticket_price"
         android:title="টিকেট প্রাইস" />
+    <item
+        android:id="@+id/delete_total_report"
+        android:title="সবগুলো ডাটা মুছুন" />
+    <item
+        android:id="@+id/add_others_amount"
+        android:title="বিলে অন্যান্য খরচ যুক্তকরণ" />
+    <item
+        android:id="@+id/bill_generate"
+        android:title="বিল জেনারেট" />
+    <item
+        android:id="@+id/daily_report"
+        android:title="দৈনিক" />
     <item
         android:id="@+id/monthly_report"
         android:title="মাসিক" />
     <item
         android:id="@+id/total_report"
         android:title="সবগুলো " />
-    <item
-        android:id="@+id/delete_total_report"
-        android:title="সবগুলো ডাটা মুছুন" />
-    <item
-        android:id="@+id/add_others_amount"
-        android:title="Add Other Amount" />
-    <item
-        android:id="@+id/bill_generate"
-        android:title="বিল জেনারেট" />
     <item
         android:id="@+id/logout"
         android:title="লগআউট" />

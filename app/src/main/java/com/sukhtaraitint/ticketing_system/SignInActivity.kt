@@ -40,6 +40,7 @@ var userName : String? = null
 var password : String? = null
 var adminObj : Admins? = null
 var counterObj : Counters? = null
+var isLoggedInOtherDevice: Boolean? = false
 
 private var PRIVATE_MODE = 0
 private val PREF_NAME = "ticket-management"
@@ -166,8 +167,17 @@ class SignInActivity : AppCompatActivity() {
                                     if(it != null){
                                         if(it.user_name!!.equals(userName) && it.password!!.equals(password) && (it.device_uuid == null || it.device_uuid!!.equals("") || it.device_uuid!!.equals(androidId))){
                                             counterObj = it
+                                            isLoggedInOtherDevice = false
+                                            return@forEach
+                                        }else{
+                                            isLoggedInOtherDevice = true
                                         }
                                     }
+                                }
+
+                                if(isLoggedInOtherDevice!!){
+                                    Toast.makeText(applicationContext, "আপনার ডিভাইসটি এই আইডির জন্য রেজিস্টার্ড নয় ।\nঅনগ্রহ করে এডমিনের সাথে যোগাযোগ করুন । ", Toast.LENGTH_LONG).show()
+                                    return
                                 }
 
                                 if(counterObj != null){
@@ -194,7 +204,7 @@ class SignInActivity : AppCompatActivity() {
                                     startActivity(Intent(applicationContext, MainActivity::class.java))
                                     finish()
                                 }else{
-                                    Toast.makeText(applicationContext, "সঠিক তথ্য দিয়ে পুনরায় চেষ্টা করুন", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(applicationContext, "সঠিক তথ্য দিয়ে পুনরায় চেষ্টা করুন", Toast.LENGTH_LONG).show()
                                 }
 
                             }
