@@ -163,22 +163,23 @@ class SignInActivity : AppCompatActivity() {
                                 val counters = dataSnapshot.getValue<List<Counters>>()
                                 Log.d("TAG", counters?.get(0)?.name + "")
                                 val androidId = Secure.getString(contentResolver, Secure.ANDROID_ID)
+                                counterObj = null
                                 counters?.forEach {
                                     if(it != null){
                                         if(it.user_name!!.equals(userName) && it.password!!.equals(password) && (it.device_uuid == null || it.device_uuid!!.equals("") || it.device_uuid!!.equals(androidId))){
                                             counterObj = it
-                                            isLoggedInOtherDevice = false
-                                            return@forEach
+//                                            isLoggedInOtherDevice = false
+//                                            return@forEach
                                         }else{
-                                            isLoggedInOtherDevice = true
+//                                            isLoggedInOtherDevice = true
                                         }
                                     }
                                 }
 
-                                if(isLoggedInOtherDevice!!){
+                                /*if(isLoggedInOtherDevice!!){
                                     Toast.makeText(applicationContext, "আপনার ডিভাইসটি এই আইডির জন্য রেজিস্টার্ড নয় ।\nঅনগ্রহ করে এডমিনের সাথে যোগাযোগ করুন । ", Toast.LENGTH_LONG).show()
                                     return
-                                }
+                                }*/
 
                                 if(counterObj != null){
 

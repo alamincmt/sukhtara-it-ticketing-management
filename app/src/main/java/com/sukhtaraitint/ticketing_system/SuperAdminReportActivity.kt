@@ -626,6 +626,7 @@ class SuperAdminReportActivity : AppCompatActivity() {
                             var totalTicketSold : TicketSold? = null
                             ticketSoldList?.clear()
 
+                            // todo: first try with ArrayList if not list returned then try with Map.
                             if (snapshot.getValue() != null){
                                 val ticketSoldCounterSet = snapshot.value as Map<String, *>
                                 for ((key, value) in ticketSoldCounterSet) {

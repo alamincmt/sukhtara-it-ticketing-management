@@ -27,7 +27,7 @@ class SetPriceActivity : AppCompatActivity() {
     var fromCounterId: String? = null
     var toCounterId: String? = null
     var counterWiseTicketPriceId = 1
-    var counterWiseTicketPriceLastId = 1
+    var counterWiseTicketPriceLastId = 0
 
     var counterWisePriceList : ArrayList<CounterWiseTicketPrice>? = ArrayList<CounterWiseTicketPrice>()
 
@@ -181,20 +181,22 @@ class SetPriceActivity : AppCompatActivity() {
         val counterGroupListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 // Get Post object and use the values to update the UI
-                val counterWisePrice = dataSnapshot.getValue<List<CounterWiseTicketPrice>>()
+                if(dataSnapshot.value != null){
+                    val counterWisePrice = dataSnapshot.getValue<List<CounterWiseTicketPrice>>()
 
-                counterWisePriceList!!.clear()
-                counterWisePrice?.forEach {
-                    if(it != null){
-                        if(!it.price!!.equals("")){
-                            counterWisePriceList?.add(it)
+                    counterWisePriceList!!.clear()
+                    counterWisePrice?.forEach {
+                        if(it != null){
+                            if(!it.price!!.equals("")){
+                                counterWisePriceList?.add(it)
+                            }
+
+                            counterWiseTicketPriceLastId = it.id!!.toInt()
                         }
-
-                        counterWiseTicketPriceLastId = it.id!!.toInt()
                     }
-                }
 
-                updatePrice()
+                    updatePrice()
+                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
